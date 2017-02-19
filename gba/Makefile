@@ -7,6 +7,10 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM)
 endif
 
+%_pkjb.elf:
+	@echo linking pkjb
+	@$(LD) -specs=../gba_pkjb.specs $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
+
 include $(DEVKITARM)/gba_rules
 
 #---------------------------------------------------------------------------------
@@ -16,7 +20,7 @@ include $(DEVKITARM)/gba_rules
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET		:=	$(shell basename $(CURDIR))_mb
+TARGET		:=	$(shell basename $(CURDIR))_pkjb
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=
@@ -38,8 +42,8 @@ CFLAGS	+=	$(INCLUDE)
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
-ASFLAGS	:=	$(ARCH)
-LDFLAGS	=	-g $(ARCH) -Wl,-Map,$(notdir $@).map
+ASFLAGS	:=	-g $(ARCH)
+LDFLAGS	=	$(ARCH) -Wl,-Map,$(notdir $@).map
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
@@ -109,6 +113,7 @@ export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 #---------------------------------------------------------------------------------
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
+	$(CC) -MMD -MP -MF start/pkjb_crt0.d -x assembler-with-cpp $(ASFLAGS) -c start/pkjb_crt0.s -o start/pkjb_crt0.o $(ERROR_FILTER)
 	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 all	: $(BUILD)
@@ -150,7 +155,7 @@ $(OUTPUT).elf	:	$(OFILES)
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
-
+	
 #---------------------------------------------------------------------------------
 # This rule creates assembly source files using grit
 # grit takes an image file and a .grit describing how the file is to be processed
