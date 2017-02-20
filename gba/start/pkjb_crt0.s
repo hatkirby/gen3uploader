@@ -85,6 +85,10 @@ start_vector:
 	ldr r1, =0x4000084
 	mov r0, #0x8F
 	strh r0, [r1]
+@; Also turn interrupts back on
+	ldr r1, =0x4000208
+	mov r0, #1
+	str r0, [r1]
 	pop {pc}
 	
 @---------------------------------------------------------------------------------
