@@ -3,7 +3,7 @@ A GC and Wii homebrew app that sends a binary to the GBA using the different mul
 
 # Usage
 Have a GC Controller in Port 1 and a GBA with Gen3 game in Port 2.
-Put your payload code to do some interesting stuff with the Pokémon game you have in `gba` dir. Example code that changes first character of player name to 'z' on Pokémon Ruby English (v1.0-1.2) provided.
+Put your payload code to do some interesting stuff with the Pokémon game you have in `gba` dir. Example code that changes first character of player name to 'z' provided.
 Recompile, send to Wii or GC, turn on your GBA, hope that your code runs after the initial copyright screen of the game.
 (Code execution rate is for some reason not 100% reliable, PR to fix would be greatly appreciated. Sometimes KeyC derivation fails, sometimes GBA ignores the sent multiboot image, could be due to failure of a few different sends)
 
