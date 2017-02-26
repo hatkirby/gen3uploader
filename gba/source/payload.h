@@ -8,6 +8,7 @@
  */
 
 #include "saveblocks.h"
+#include "libpayload.h"
 
 #define GAME_RUBY (((*(u32*)(0x80000AC)) << 8) == 'VXA\x00')
 #define GAME_SAPP (((*(u32*)(0x80000AC)) << 8) == 'PXA\x00')
