@@ -1,4 +1,4 @@
-# GBA Gen3 Multiboot
+﻿# GBA Gen3 Multiboot
 A GC and Wii homebrew app that sends a binary to the GBA using the different multiboot protocol used by the third generation of Pokémon games (Ruby, Sapphire, Emerald, FireRed, LeafGreen).
 
 # Usage
