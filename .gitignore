@@ -1,0 +1,7 @@
+*.elf
+build
+data
+*.dol
+tags
+*.o
+*.d
