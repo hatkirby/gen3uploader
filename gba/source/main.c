@@ -96,31 +96,53 @@ int main(void)
 	m3_fill(RGB15(31,31,31));
   plot_sqr( 4, 4, RGB15(31, 0, 0) );    // or CLR_RED
 
-
+	/*
 	
   //*(vu16 *)(REG_BASE + 0x84) = 0x8f;
   //REG_IME = 1;
   // the vblank interrupt must be enabled for VBlankIntrWait() to work
   // since the default dispatcher handles the bios flags no vblank handler
   // is required
-  //irqInit();
-  //irqEnable(IRQ_VBLANK);
+  irqInit();
+  irqEnable(IRQ_VBLANK);
 
-  //consoleDemoInit();
+  consoleDemoInit();
   //REG_JOYTR = 0;
 
   // ansi escape sequence to set print co-ordinates
   // /x1b[line;columnH
   //u32 i;
-  //iprintf("\x1b[9;2HPokemon Gen III Data Extractor\n");
-  //iprintf("\x1b[10;4HPlease look at the TV\n");
+  iprintf("\x1b[9;2HPokemon Gen III Data Extractor\n");
+  iprintf("\x1b[10;4HPlease look at the TV\n");
 
   // disable this, needs power
-  //SNDSTAT = 0;
-  //SNDBIAS = 0;
+  SNDSTAT = 0;
+  SNDBIAS = 0;
 
   // Set up waitstates for EEPROM access etc.
-  //REG_WAITCNT = 0x0317;
+  REG_WAITCNT = 0x0317;
+	
+	s32 gamesize = getGameSize();
+				u32 savesize = SaveSize(save_data,gamesize);
+  switch (savesize){
+    case 0x200:
+      GetSave_EEPROM_512B(save_data);
+      break;
+    case 0x2000:
+      GetSave_EEPROM_8KB(save_data);
+      break;
+    case 0x8000:
+      GetSave_SRAM_32KB(save_data);
+      break;
+    case 0x10000:
+      GetSave_FLASH_64KB(save_data);
+      break;
+    case 0x20000:
+      GetSave_FLASH_128KB(save_data);
+      break;
+    default:
+      break;
+  }*/
 
   //clear out previous messages
   REG_HS_CTRL |= JOY_RW;
@@ -172,10 +194,12 @@ int main(void)
   plot_sqr( 5, 4, RGB15( 31, 0,31) );
     waitForAck();
   plot_sqr( 5, 5, RGB15( 16, 16,16) );
+
     // Get access to save data.
     pSaveBlock1 SaveBlock1;
     pSaveBlock2 SaveBlock2;
     pSaveBlock3 SaveBlock3;
+		//iprintf("gonna check thing\n");
     if (!initSaveData(&SaveBlock1, &SaveBlock2, &SaveBlock3))
     {
       // Unsupported game version.
@@ -187,12 +211,13 @@ int main(void)
 
       continue;
     }
+		//iprintf("success\n");
   plot_sqr( 5, 6, RGB15( 0, 31,16) );
     sendS32(1);
     waitForAck();
-		/*
+		
     // Send trainer name.
-    u8* trainerName;
+    u8* trainerName = 0;
 
     if (GAME_RS)
     {
@@ -204,14 +229,6 @@ int main(void)
     {
       trainerName = SaveBlock2->e.playerName;
     }
-    iprintf("%d\n", trainerName[0]);
-    iprintf("%d\n", trainerName[1]);
-    iprintf("%d\n", trainerName[2]);
-    iprintf("%d\n", trainerName[3]);
-    iprintf("%d\n", trainerName[4]);
-    iprintf("%d\n", trainerName[5]);
-    iprintf("%d\n", trainerName[6]);
-    iprintf("%d\n", trainerName[7]);
 
     u32 tn1 =
         (trainerName[0] << 24)
@@ -230,10 +247,10 @@ int main(void)
 
     sendU32(tn2);
     waitForAck();
-*/
-    // Send trainer ID.
-    u8* trainerId = 0;
 
+    // Send trainer ID.
+		
+    u8* trainerId = 0;
     if (GAME_RS)
     {
       trainerId = SaveBlock2->rs.playerTrainerId;
@@ -246,9 +263,10 @@ int main(void)
     }
 
     u32 tti =
-        (trainerId[2] << 8)
-      | (trainerId[3]);
+        (trainerId[1] << 8)
+      | (trainerId[0]);
 
+		//iprintf("sending trainer id %ld\n", tti);
     sendU32(tti);
     waitForAck();
 

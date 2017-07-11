@@ -493,7 +493,7 @@ bool initSaveData(
   }
 
   loadsave(0);
-
+//	sendS32(-1);
   // now the save is loaded, we can do what we want with the loaded blocks.
   // first, we're going to want to decrypt the parts that are crypted, if applicable.
   decryptSaveStructures(gSaveBlock1,gSaveBlock2,gSaveBlock3);

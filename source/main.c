@@ -17,6 +17,7 @@
 #include <dirent.h>
 #include <fat.h>
 #include "link.h"
+#include "encoding.h"
 
 //from my tests 50us seems to be the lowest
 //safe si transfer delay in between calls
@@ -308,6 +309,21 @@ u32 deriveKeyC(u32 keyCderive, u32 kcrc) {
 	return keyc;
 }
 
+u32 getMsg()
+{
+  u32 val = 0;
+	while (val == 0)
+	{
+		val = __builtin_bswap32(recv());
+		fsleep(1);
+	}
+  send(0);
+	while (recv()!=0) {fsleep(1);};
+	send(0);
+	
+	return val;
+}
+
 int main(int argc, char *argv[])
 {
   void *xfb = NULL;
@@ -482,7 +498,7 @@ int main(int argc, char *argv[])
 			u32 bootkey = docrc(0xBB,keyc) | 0xbb000000;
 			printf("BootKey = 0x%08lx\n",bootkey);
 			send(bootkey);
-                        /*
+			/*
       printf("GBA Found! Waiting on BIOS...\n");
 
       resbuf[2]=0;
@@ -557,12 +573,12 @@ int main(int argc, char *argv[])
           endproc();
         } else if (btns & PAD_BUTTON_A)
         {*/
-			sleep(1);
+			sleep(2);
 						//recv();
 			
 			//if (recv() == 0) //ready
-          {
-						
+          //{
+			{{
             printf("Waiting for GBA...\n");
 						while (recv() != 0) {fsleep(1);};
 						send(0);
@@ -604,6 +620,7 @@ int main(int argc, char *argv[])
 						
             send(0);
 						while (recv()!=0) {fsleep(1);};
+						send(0);
 						//sleep(1);
 
             if (gameId == -1)
@@ -644,27 +661,26 @@ int main(int argc, char *argv[])
 
             send(0);
 						while (recv()!=0) {fsleep(1);};
+						send(0);
 						//sleep(1);
-						/*
+						
             // Get trainer name
             u8 trainerName[8];
 
-            u32 tnd = recv();
-            send(0);
-            trainerName[0] = (tnd & 0xFF000000);
-            trainerName[1] = (tnd & 0x00FF0000) >> 8;
-            trainerName[2] = (tnd & 0x0000FF00) >> 16;
-            trainerName[3] = (tnd & 0x000000FF) >> 24;
+            u32 tnd = getMsg();
+            //send(0);
+            trainerName[0] = (tnd & 0xFF000000) >> 24;
+            trainerName[1] = (tnd & 0x00FF0000) >> 16;
+            trainerName[2] = (tnd & 0x0000FF00) >> 8;
+            trainerName[3] = (tnd & 0x000000FF);
 
-            tnd = recv();
-            send(0);
-            trainerName[4] = (tnd & 0xFF000000);
-            trainerName[5] = (tnd & 0x00FF0000) >> 8;
-            trainerName[6] = (tnd & 0x0000FF00) >> 16;
-            trainerName[7] = (tnd & 0x000000FF) >> 24;
-
-            printf("Trainer: %s", (char*) trainerName);
-*/
+            tnd = getMsg();
+            //send(0);
+            trainerName[4] = (tnd & 0xFF000000) >> 24;
+            trainerName[5] = (tnd & 0x00FF0000) >> 16;
+            trainerName[6] = (tnd & 0x0000FF00) >> 8;
+            trainerName[7] = (tnd & 0x000000FF);
+						
             // Get trainer ID
             u32 trainerId = 0;
 						while (trainerId == 0)
@@ -674,7 +690,20 @@ int main(int argc, char *argv[])
 						}
             send(0);
 						while (recv()!=0) {fsleep(1);};
+						send(0);
 						//sleep(1);
+						
+            printf("Trainer: ");
+						
+						for (int i = 0; i < 8; i++)
+						{
+							if (trainerName[i] == 0xFF)
+							{
+								break;
+							} else {
+								printf("%c", debugGen3Decode(trainerName[i]));
+							}
+						}
 
             printf(" (%ld)\n", trainerId);
 
@@ -917,9 +946,9 @@ int main(int argc, char *argv[])
             sleep(5);
           }
         }*/
-//      }
-  //  }
-//  }
+				      }
+//							  }
+//								  }
   }
   return 0;
 }
