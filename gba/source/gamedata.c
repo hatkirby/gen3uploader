@@ -1,9 +1,9 @@
 /*
- * Pokemon Gen III Data Extractor by hatkirby 2017.
+ * Copyright (C) 2017 hatkirby
+ * Copyright (C) 2017 slipstream/RoL
  *
  * This software may be modified and distributed under the terms
  * of the MIT license.  See the LICENSE file for details.
- *
  */
 #include "gamedata.h"
 
@@ -245,9 +245,10 @@ bool initSaveData(
     }
 
     /// --- FR/LG ---
-    // In FR/LG, the function that initialises the save-block pointers to default does not set up saveblock3.
-    // Which will need to be set up before loading the save if we want boxed Pokémon to not disappear.
-    // Oh, and loadsave() offset is different between FR and LG...
+    // In FR/LG, the function that initialises the save-block pointers to
+    // default does not set up saveblock3. Which will need to be set up before
+    // loading the save if we want boxed Pokémon to not disappear. Oh, and
+    // loadsave() offset is different between FR and LG...
 
     case 'DRPB': // FireRed German
     case 'DGPB': // LeafGreen German
@@ -376,12 +377,14 @@ bool initSaveData(
           {
             // LeafGreen v1.1 Japanese is undumped.
             // Therefore, it is unsupported.
-            // I will make guesses at the offsets in the comments, but I will not actually implement them until LeafGreen v1.1 is dumped.
+            // I will make guesses at the offsets in the comments, but I will
+            // not actually implement them until LeafGreen v1.1 is dumped.
 
             return false;
           }
 
-          loadsave = (void(*)(char)) 0x80db529; // potential LG1.1 address: 0x80db4fd
+          loadsave = (void(*)(char)) 0x80db529;
+          // potential LG1.1 address: 0x80db4fd
           //mainloop = (void(*)()) 0x8000417;
           //titlemid = 0x8078987;
           //load_pokemon = (void(*)()) 0x804b9c5;
@@ -399,8 +402,10 @@ bool initSaveData(
     }
 
     /// --- Emerald ---
-    // In Emerald, the saveblock pointer that isn't set up is saveblock1 (in FR/LG it was saveblock3).
-    // The initial save loading code after the copyright screen is also updated, now it sets up ASLR/crypto here before loading the save.
+    // In Emerald, the saveblock pointer that isn't set up is saveblock1 (in
+    // FR/LG it was saveblock3). The initial save loading code after the
+    // copyright screen is also updated, now it sets up ASLR/crypto here before
+    // loading the save.
 
     case 'DEPB': // Emerald German
     {
@@ -493,42 +498,15 @@ bool initSaveData(
   }
 
   loadsave(0);
-//	sendS32(-1);
+
   // now the save is loaded, we can do what we want with the loaded blocks.
-  // first, we're going to want to decrypt the parts that are crypted, if applicable.
+  // first, we're going to want to decrypt the parts that are crypted, if
+  // applicable.
   decryptSaveStructures(gSaveBlock1,gSaveBlock2,gSaveBlock3);
 
   *SaveBlock1 = gSaveBlock1;
   *SaveBlock2 = gSaveBlock2;
   *SaveBlock3 = gSaveBlock3;
 
-  /*
-  // time to call the payload.
-  payload(gSaveBlock1,gSaveBlock2,gSaveBlock3);
-  // Now, we better call the function that sets the pokemon-related stuff from the structure elements of the loaded save again.
-  // Just in case the payload did something with that.
-  load_pokemon();
-  // In FR/LG/Emerald, just returning to the game is unwise.
-  // The game reloads the savefile.
-  // In FR/LG, this is done at the title screen after setting ASLR/saveblock-crypto up. (probably because at initial save-load, SaveBlock3 ptr isn't set up lol)
-  // So, better bypass the title screen and get the game to return directly to the Continue/New Game screen.
-  // In Emerald, the save reload happens after the Continue option was chosen, so we have no choice but to bypass everything and get the game to go straight to the overworld.
-  // Easiest way to do this is to call into the middle of the function we want, using an ASM wrapper to set up the stack.
-  // Here goes...
-  if (titlemid) {
-    // Function reserves an extra 4 bytes of stack space in FireRed/LeafGreen, and none in Emerald.
-    call_into_middle_of_titlescreen_func(titlemid,(GAME_EM ? 0 : 4));
-  }
-  // Now we've done what we want, time to return to the game.
-  // Can't just return, the game will reload the save.
-  // So let's just call the main-loop directly ;)
-  // turn the sound back on before we head back to the game
-  *(vu16 *)(REG_BASE + 0x84) = 0x8f;
-  // re-enable interrupts
-  REG_IME = 1;
-  mainloop();
-  // Anything past here will not be executed.
-  return 0;
-  */
   return true;
 }
