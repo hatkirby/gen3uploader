@@ -10,7 +10,7 @@
 
 int main(void)
 {
-	initializeLink();
+  initializeLink();
 
   // Identify the host game.
   if (GAME_RUBY)
@@ -30,9 +30,9 @@ int main(void)
     sendS32(5);
   } else {
     sendS32(-1);
-		waitForAck();
+    waitForAck();
 
-		return 0;
+    return 0;
   }
 
   waitForAck();
@@ -46,9 +46,9 @@ int main(void)
   {
     // Unsupported game version.
     sendS32(-1);
-		waitForAck();
+    waitForAck();
 
-		return 0;
+    return 0;
   }
 
   sendS32(1);
@@ -105,6 +105,4 @@ int main(void)
 
   sendU32(tti);
   waitForAck();
-
-	// Halt();
 }

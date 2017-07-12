@@ -5,3 +5,4 @@ data
 tags
 *.o
 *.d
+*.swp

@@ -12,8 +12,8 @@
 
 void initializeLink()
 {
-	REG_HS_CTRL |= JOY_RW;
-	REG_JOYTR = 0;
+  REG_HS_CTRL |= JOY_RW;
+  REG_JOYTR = 0;
   while ((REG_HS_CTRL & JOY_WRITE) == 0);
   REG_HS_CTRL |= JOY_RW;
 }
@@ -22,7 +22,7 @@ void waitForAck()
 {
   while ((REG_HS_CTRL & JOY_WRITE) == 0);
   REG_HS_CTRL |= JOY_RW;
-	REG_JOYTR = 0;
+  REG_JOYTR = 0;
   while ((REG_HS_CTRL & JOY_WRITE) == 0);
   REG_HS_CTRL |= JOY_RW;
 }

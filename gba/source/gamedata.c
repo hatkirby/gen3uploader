@@ -244,11 +244,11 @@ bool initSaveData(
       break;
     }
 
-    /// --- FR/LG ---
-    // In FR/LG, the function that initialises the save-block pointers to
-    // default does not set up saveblock3. Which will need to be set up before
-    // loading the save if we want boxed Pokémon to not disappear. Oh, and
-    // loadsave() offset is different between FR and LG...
+      /// --- FR/LG ---
+      // In FR/LG, the function that initialises the save-block pointers to
+      // default does not set up saveblock3. Which will need to be set up before
+      // loading the save if we want boxed Pokémon to not disappear. Oh, and
+      // loadsave() offset is different between FR and LG...
 
     case 'DRPB': // FireRed German
     case 'DGPB': // LeafGreen German
@@ -401,11 +401,11 @@ bool initSaveData(
       break;
     }
 
-    /// --- Emerald ---
-    // In Emerald, the saveblock pointer that isn't set up is saveblock1 (in
-    // FR/LG it was saveblock3). The initial save loading code after the
-    // copyright screen is also updated, now it sets up ASLR/crypto here before
-    // loading the save.
+      /// --- Emerald ---
+      // In Emerald, the saveblock pointer that isn't set up is saveblock1 (in
+      // FR/LG it was saveblock3). The initial save loading code after the
+      // copyright screen is also updated, now it sets up ASLR/crypto here before
+      // loading the save.
 
     case 'DEPB': // Emerald German
     {
