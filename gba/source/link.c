@@ -27,6 +27,21 @@ void waitForAck()
   REG_HS_CTRL |= JOY_RW;
 }
 
+u32 waitForResponse()
+{
+  u32 val;
+
+  REG_JOYTR = 1;
+  while ((REG_HS_CTRL & JOY_WRITE) == 0);
+  val = REG_JOYRE;
+  REG_HS_CTRL |= JOY_RW;
+  REG_JOYTR = 0;
+  while ((REG_HS_CTRL & JOY_WRITE) == 0);
+  REG_HS_CTRL |= JOY_RW;
+
+  return val;
+}
+
 void sendS32(s32 val)
 {
   REG_JOYTR = val;
@@ -35,4 +50,11 @@ void sendS32(s32 val)
 void sendU32(u32 val)
 {
   REG_JOYTR = val;
+}
+
+void directSendU32(u32 val)
+{
+  REG_JOYTR = val;
+  while ((REG_HS_CTRL & JOY_READ) == 0);
+  REG_HS_CTRL |= JOY_RW;
 }

@@ -240,10 +240,27 @@ u32 getMsg()
   }
 
   send(0);
-  while (recv()!=0) {sleep(1);};
+  while (recv()!=0) {sleep(1);}
   send(0);
 
   return val;
+}
+
+void getMsgArr(u32* arr, int len)
+{
+  for (int i=0; i<len; i++)
+  {
+    *(vu32*)(arr+i) = __builtin_bswap32(recv());
+    usleep(500000);
+  }
+}
+
+void sendMsg(u32 msg)
+{
+  while (recv()==0) {sleep(1);}
+  send(msg);
+  while (recv()!=0) {sleep(1);}
+  send(0);
 }
 
 int main(int argc, char *argv[])
@@ -520,8 +537,44 @@ int main(int argc, char *argv[])
 
       if (waitForButtons(PAD_BUTTON_A | PAD_BUTTON_B) & PAD_BUTTON_B)
       {
+        printf("Cancelling...\n");
+        VIDEO_WaitVSync();
+
+        sendMsg(0);
+
         continue;
       }
+
+      printf("Importing...\n");
+      VIDEO_WaitVSync();
+
+      sendMsg(1);
+
+      // Get Pokédex data
+      u32 pokedexSeen[13];
+      u32 pokedexCaught[13];
+
+      getMsgArr(pokedexSeen, 13);
+      getMsgArr(pokedexCaught, 13);
+      int numCaught = 0;
+      int numSeen = 0;
+      for (int i=0; i<(13*32); i++)
+      {
+        if (pokedexCaught[i >> 5] >> (i & 31) & 1)
+        {
+          //printf("Caught #%d\n", i);
+          numCaught++;
+          numSeen++;
+        } else if (pokedexSeen[i >> 5] >> (i & 31) & 1)
+        {
+          //printf("Saw #%d\n", i);
+          numSeen++;
+        }
+      }
+
+      printf("Caught: %d\nSeen: %d\n", numCaught, numSeen);
+
+      waitForButtons(PAD_BUTTON_START);
     }
   }
 

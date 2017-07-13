@@ -10,6 +10,10 @@
 
 int main(void)
 {
+  // This possibly increases stability, I don't rightly know, this is all black
+  // magic, will test more later.
+  REG_IME = 0;
+
   initializeLink();
 
   // Identify the host game.
@@ -105,4 +109,57 @@ int main(void)
 
   sendU32(tti);
   waitForAck();
+
+  // Does the player want to import this game?
+  if (waitForResponse() == 0)
+  {
+    return 0;
+  }
+
+  // Send Pokédex data
+  u8* pokedexSeen = 0;
+  if (GAME_RS)
+  {
+    pokedexSeen = SaveBlock2->rs.pokedex.seen;
+  } else if (GAME_FRLG)
+  {
+    pokedexSeen = SaveBlock2->frlg.pokedex.seen;
+  } else if (GAME_EM)
+  {
+    pokedexSeen = SaveBlock2->e.pokedex.seen;
+  }
+
+  for (int i=0; i<13; i++)
+  {
+    u32 psi =
+        (pokedexSeen[i*4])
+      | (pokedexSeen[i*4+1] << 8)
+      | (pokedexSeen[i*4+2] << 16)
+      | (pokedexSeen[i*4+3] << 24);
+
+    directSendU32(psi);
+  }
+
+  u8* pokedexCaught = 0;
+  if (GAME_RS)
+  {
+    pokedexCaught = SaveBlock2->rs.pokedex.owned;
+  } else if (GAME_FRLG)
+  {
+    pokedexCaught = SaveBlock2->frlg.pokedex.owned;
+  } else if (GAME_EM)
+  {
+    pokedexCaught = SaveBlock2->e.pokedex.owned;
+  }
+
+  for (int i=0; i<13; i++)
+  {
+    u32 psi =
+        (pokedexCaught[i*4])
+      | (pokedexCaught[i*4+1] << 8)
+      | (pokedexCaught[i*4+2] << 16)
+      | (pokedexCaught[i*4+3] << 24);
+
+    directSendU32(psi);
+  }
 }

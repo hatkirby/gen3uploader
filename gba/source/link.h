@@ -11,7 +11,9 @@
 
 void initializeLink();
 void waitForAck();
+u32 waitForResponse();
 void sendS32(s32 val);
 void sendU32(u32 val);
+void directSendU32(u32 val);
 
 #endif
