@@ -86,11 +86,10 @@ u32 getMsg()
   while (val == 0)
   {
     val = __builtin_bswap32(recv());
-    sleep(1);
   }
 
   send(0);
-  while (recv()!=0) {sleep(1);}
+  while (recv()!=0);
   send(0);
 
   return val;
@@ -101,15 +100,14 @@ void getMsgArr(u32* arr, int len)
   for (int i=0; i<len; i++)
   {
     *(vu32*)(arr+i) = __builtin_bswap32(recv());
-    usleep(500000);
   }
 }
 
 void sendMsg(u32 msg)
 {
-  while (recv()==0) {sleep(1);}
+  while (recv()==0);
   send(msg);
-  while (recv()!=0) {sleep(1);}
+  while (recv()!=0);
   send(0);
 }
 
@@ -158,6 +156,6 @@ void waitForGame()
 
 void waitForAck()
 {
-  while (recv() != 0) {sleep(1);};
+  while (recv() != 0) {sleep(1);}
   send(0);
 }
