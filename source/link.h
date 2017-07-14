@@ -9,6 +9,18 @@
 
 #include <gccore.h>
 
-u32 waitForButtons(u32 mask);
+void initLink();
+
+u32 recv();
+void send(u32 msg);
+
+u32 getMsg();
+void getMsgArr(u32* arr, int len);
+void sendMsg(u32 msg);
+
+void waitForGBA();
+void waitForBIOS();
+void waitForGame();
+void waitForAck();
 
 #endif
