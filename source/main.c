@@ -183,23 +183,26 @@ void* extractor(void* userdata)
 
     getMsgArr(pokedexSeen, 13);
     getMsgArr(pokedexCaught, 13);
-    int numCaught = 0;
-    int numSeen = 0;
+
+    printf("Saw: ");
+    for (int i=0; i<(13*32); i++)
+    {
+      if (pokedexSeen[i >> 5] >> (i & 31) & 1)
+      {
+        printf("#%d, ", i+1);
+      }
+    }
+
+    printf("\nCaught: ");
     for (int i=0; i<(13*32); i++)
     {
       if (pokedexCaught[i >> 5] >> (i & 31) & 1)
       {
-        //printf("Caught #%d\n", i);
-        numCaught++;
-        numSeen++;
-      } else if (pokedexSeen[i >> 5] >> (i & 31) & 1)
-      {
-        //printf("Saw #%d\n", i);
-        numSeen++;
+        printf("#%d, ", i+1);
       }
     }
 
-    printf("Caught: %d\nSeen: %d\n", numCaught, numSeen);
+    printf("\n");
 
     waitForButtons(PAD_BUTTON_START);
   }
