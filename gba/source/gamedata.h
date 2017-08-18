@@ -27,9 +27,6 @@ struct GameData {
   pSaveBlock1 SaveBlock1;
   pSaveBlock2 SaveBlock2;
   pSaveBlock3 SaveBlock3;
-  struct BaseStats* baseStats;
-  ExperienceTables expTables;
-  const u16* natOrder;
 };
 
 bool initSaveData(struct GameData* gameData);

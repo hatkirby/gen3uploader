@@ -7,6 +7,9 @@
 #include "serialize.h"
 #include "gamedata.h"
 #include "link.h"
+#include "basestats.h"
+#include "exptables.h"
+#include "dexorder.h"
 
 #define UNOWN_SPECIES_INDEX 201
 #define SHEDINJA_SPECIES_INDEX 303
@@ -60,7 +63,7 @@ void PokemonIntermediateInit(
   struct PokemonSubstruct2* sub2 = GetBoxPokemonSubstruct2(bpkm);
   struct PokemonSubstruct3* sub3 = GetBoxPokemonSubstruct3(bpkm);
 
-  struct BaseStats* baseStats = &gameData->baseStats[sub0->species];
+  const struct SmallBaseStats* baseStats = &gSmallBaseStats[sub0->species];
 
   for (int i=0; i<POKEMON_NAME_LENGTH; i++)
   {
@@ -74,7 +77,7 @@ void PokemonIntermediateInit(
 
   pki->otId = bpkm->otId;
   pki->otGender = sub3->otGender;
-  pki->species = gameData->natOrder[sub0->species - 1];
+  pki->species = gSpeciesToNationalPokedexNum[sub0->species - 1];
   pki->heldItem = sub0->heldItem;
   pki->experience = sub0->experience;
 
@@ -141,7 +144,7 @@ void PokemonIntermediateInit(
   // Calculate level from experience.
   pki->level = 1;
 
-  const u32* expTable = gameData->expTables[baseStats->growthRate];
+  const u32* expTable = gExperienceTables[baseStats->growthRate];
   while ((pki->level <= 100) && (expTable[pki->level] <= sub0->experience))
   {
     pki->level++;

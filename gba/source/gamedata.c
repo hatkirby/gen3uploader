@@ -140,9 +140,6 @@ bool initSaveData(struct GameData* gameData)
   pSaveBlock1 gSaveBlock1;
   pSaveBlock2 gSaveBlock2;
   pSaveBlock3 gSaveBlock3;
-  struct BaseStats* gBaseStats;
-  const u32 (*gExpTables)[101];
-  const u16* gNatOrder;
   //u32 titlemid = 0;
 
   // get the address of the save loading function.
@@ -345,9 +342,6 @@ bool initSaveData(struct GameData* gameData)
           //mainloop = (void(*)()) 0x8000429;
           //titlemid = 0x807928f;
           //load_pokemon = (void(*)()) 0x804c245;
-          gBaseStats = (struct BaseStats*) ( GAME_FR ? 0 : 0x82547d0 );
-          gExpTables = (ExperienceTables) ( GAME_FR ? 0 : 0x8253b30 );
-          gNatOrder = (const u16*) ( GAME_FR ? 0 : 0x825203a );
 
           break;
         }
@@ -518,9 +512,6 @@ bool initSaveData(struct GameData* gameData)
   gameData->SaveBlock1 = gSaveBlock1;
   gameData->SaveBlock2 = gSaveBlock2;
   gameData->SaveBlock3 = gSaveBlock3;
-  gameData->baseStats = gBaseStats;
-  gameData->expTables = gExpTables;
-  gameData->natOrder = gNatOrder;
 
   return true;
 }
