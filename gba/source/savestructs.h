@@ -9,9 +9,7 @@
 
 // Most of the structures come from pokeruby, FR/LG changes come from my own research / the firered IDB on pokecommunity
 
-#define POKEMON_NAME_LENGTH 10
-#define OT_NAME_LENGTH 7
-#define TILE_SIZE_4BPP 32
+#include "pokemon.h"
 
 struct Coords16
 {
@@ -495,6 +493,7 @@ struct BaseStats
  /* 0x17 */ u8 ability2;
  /* 0x18 */ u8 safariZoneFleeRate;
  /* 0x19 */ u8 bodyColor;
+ u16 filler;
 };
 
 struct BattleMove

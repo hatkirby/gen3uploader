@@ -7,7 +7,7 @@
  */
 #include "gamedata.h"
 
-void decryptSaveStructures(
+static void decryptSaveStructures(
     pSaveBlock1 SaveBlock1,
     pSaveBlock2 SaveBlock2,
     pSaveBlock3 SaveBlock3)
@@ -119,10 +119,15 @@ void decryptSaveStructures(
   *xor_key_ptr = 0;
 }
 
-bool initSaveData(
-    pSaveBlock1* SaveBlock1,
-    pSaveBlock2* SaveBlock2,
-    pSaveBlock3* SaveBlock3)
+static void CryptBoxPokemon(struct BoxPokemon* pkm)
+{
+	for (u32 i = 0; i < 12; i++)
+  {
+		pkm->secure.raw[i] ^= (pkm->otId ^ pkm->personality);
+	}
+}
+
+bool initSaveData(struct GameData* gameData)
 {
   // check the ROM code, make sure this game is supported.
   u8* ROM = (u8*) 0x8000000;
@@ -135,6 +140,9 @@ bool initSaveData(
   pSaveBlock1 gSaveBlock1;
   pSaveBlock2 gSaveBlock2;
   pSaveBlock3 gSaveBlock3;
+  struct BaseStats* gBaseStats;
+  const u32 (*gExpTables)[101];
+  const u16* gNatOrder;
   //u32 titlemid = 0;
 
   // get the address of the save loading function.
@@ -337,6 +345,9 @@ bool initSaveData(
           //mainloop = (void(*)()) 0x8000429;
           //titlemid = 0x807928f;
           //load_pokemon = (void(*)()) 0x804c245;
+          gBaseStats = (struct BaseStats*) ( GAME_FR ? 0 : 0x82547d0 );
+          gExpTables = (ExperienceTables) ( GAME_FR ? 0 : 0x8253b30 );
+          gNatOrder = (const u16*) ( GAME_FR ? 0 : 0x825203a );
 
           break;
         }
@@ -504,9 +515,149 @@ bool initSaveData(
   // applicable.
   decryptSaveStructures(gSaveBlock1,gSaveBlock2,gSaveBlock3);
 
-  *SaveBlock1 = gSaveBlock1;
-  *SaveBlock2 = gSaveBlock2;
-  *SaveBlock3 = gSaveBlock3;
+  gameData->SaveBlock1 = gSaveBlock1;
+  gameData->SaveBlock2 = gSaveBlock2;
+  gameData->SaveBlock3 = gSaveBlock3;
+  gameData->baseStats = gBaseStats;
+  gameData->expTables = gExpTables;
+  gameData->natOrder = gNatOrder;
 
   return true;
+}
+
+void DecryptPokemon(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  CryptBoxPokemon(boxMon);
+}
+
+void DecryptBoxPokemon(struct BoxPokemon* pkm)
+{
+  CryptBoxPokemon(pkm);
+}
+
+void EncryptPokemon(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  EncryptBoxPokemon(boxMon);
+}
+
+void EncryptBoxPokemon(struct BoxPokemon* pkm)
+{
+  FixBoxPokemonChecksum(pkm);
+  CryptBoxPokemon(pkm);
+}
+
+union PokemonSubstruct* GetPokemonSubstruct(struct Pokemon* pkm,u8 substructId)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  return GetBoxPokemonSubstruct(boxMon,substructId);
+}
+
+union PokemonSubstruct* GetBoxPokemonSubstruct(
+    struct BoxPokemon* pkm,
+    u8 substructId)
+{
+  if (substructId > 3)
+  {
+    return NULL;
+  }
+
+  u32 personality = pkm->personality;
+  u32 modulo = (personality % 24);
+
+  // Staring at the substruct indexes, I noticed the last two columns are the
+  // reverse of the first two! that is, substructId==2 column is the reverse of
+  // substructId==1, substructId==3 is the reverse of substructId==0.
+  // At least that means there's no need to hardcode all four.
+  u8 substruct_idxes[2][24] = {
+    { 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 2, 3, 1, 1, 2, 3, 2, 3, 1, 1, 2, 3, 2, 3 },
+    { 1, 1, 2, 3, 2, 3, 0, 0, 0, 0, 0, 0, 2, 3, 1, 1, 3, 2, 2, 3, 1, 1, 3, 2 }
+  };
+
+  if (substructId < 2)
+  {
+    return &(pkm->secure.substructs[substruct_idxes[substructId][modulo]]);
+  }
+
+  return &(pkm->secure.substructs[
+      substruct_idxes[3 - substructId][23 - modulo]]);
+}
+
+u16 CalculateBoxPokemonChecksum(struct BoxPokemon* pkm)
+{
+  u16 checksum = 0;
+
+  union PokemonSubstruct* substructs[4] = {
+    GetBoxPokemonSubstruct(pkm,0),
+    GetBoxPokemonSubstruct(pkm,1),
+    GetBoxPokemonSubstruct(pkm,2),
+    GetBoxPokemonSubstruct(pkm,3)
+  };
+
+  for (int substruct = 0; substruct < 4; substruct++)
+  {
+    for (int i = 0; i < 6; i++)
+    {
+      checksum += substructs[substruct]->raw[i];
+    }
+  }
+
+  return checksum;
+}
+
+void FixBoxPokemonChecksum(struct BoxPokemon* pkm)
+{
+  pkm->checksum = CalculateBoxPokemonChecksum(pkm);
+}
+
+struct PokemonSubstruct0* GetPokemonSubstruct0(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  return GetBoxPokemonSubstruct0(boxMon);
+}
+
+struct PokemonSubstruct0* GetBoxPokemonSubstruct0(struct BoxPokemon* pkm)
+{
+  return &(GetBoxPokemonSubstruct(pkm,0)->type0);
+}
+
+struct PokemonSubstruct1* GetPokemonSubstruct1(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  return GetBoxPokemonSubstruct1(boxMon);
+}
+
+struct PokemonSubstruct1* GetBoxPokemonSubstruct1(struct BoxPokemon* pkm)
+{
+  return &(GetBoxPokemonSubstruct(pkm,1)->type1);
+}
+
+struct PokemonSubstruct2* GetPokemonSubstruct2(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  return GetBoxPokemonSubstruct2(boxMon);
+}
+
+struct PokemonSubstruct2* GetBoxPokemonSubstruct2(struct BoxPokemon* pkm)
+{
+  return &(GetBoxPokemonSubstruct(pkm,2)->type2);
+}
+
+struct PokemonSubstruct3* GetPokemonSubstruct3(struct Pokemon* pkm)
+{
+  struct BoxPokemon* boxMon = &(pkm->box);
+
+  return GetBoxPokemonSubstruct3(boxMon);
+}
+
+struct PokemonSubstruct3* GetBoxPokemonSubstruct3(struct BoxPokemon* pkm)
+{
+  return &(GetBoxPokemonSubstruct(pkm,3)->type3);
 }

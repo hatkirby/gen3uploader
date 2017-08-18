@@ -19,7 +19,7 @@ TARGET		:=	gen3uploader_wii
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=	source
+INCLUDES	:=	source include
 
 #---------------------------------------------------------------------------------
 # options for code generation

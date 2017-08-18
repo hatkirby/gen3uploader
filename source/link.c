@@ -99,7 +99,7 @@ void getMsgArr(u32* arr, int len)
 {
   for (int i=0; i<len; i++)
   {
-    *(vu32*)(arr+i) = __builtin_bswap32(recv());
+    *(vu32*)(arr+i) = recv();
   }
 }
 

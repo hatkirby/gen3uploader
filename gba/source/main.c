@@ -7,6 +7,7 @@
 #include <gba.h>
 #include "gamedata.h"
 #include "link.h"
+#include "serialize.h"
 
 int main(void)
 {
@@ -42,11 +43,9 @@ int main(void)
   waitForAck();
 
   // Get access to save data.
-  pSaveBlock1 SaveBlock1;
-  pSaveBlock2 SaveBlock2;
-  pSaveBlock3 SaveBlock3;
+  struct GameData gameData;
 
-  if (!initSaveData(&SaveBlock1, &SaveBlock2, &SaveBlock3))
+  if (!initSaveData(&gameData))
   {
     // Unsupported game version.
     sendS32(-1);
@@ -63,13 +62,13 @@ int main(void)
 
   if (GAME_RS)
   {
-    trainerName = SaveBlock2->rs.playerName;
+    trainerName = gameData.SaveBlock2->rs.playerName;
   } else if (GAME_FRLG)
   {
-    trainerName = SaveBlock2->frlg.playerName;
+    trainerName = gameData.SaveBlock2->frlg.playerName;
   } else if (GAME_EM)
   {
-    trainerName = SaveBlock2->e.playerName;
+    trainerName = gameData.SaveBlock2->e.playerName;
   }
 
   u32 tn1 =
@@ -94,20 +93,24 @@ int main(void)
   u8* trainerId = 0;
   if (GAME_RS)
   {
-    trainerId = SaveBlock2->rs.playerTrainerId;
+    trainerId = gameData.SaveBlock2->rs.playerTrainerId;
   } else if (GAME_FRLG)
   {
-    trainerId = SaveBlock2->frlg.playerTrainerId;
+    trainerId = gameData.SaveBlock2->frlg.playerTrainerId;
   } else if (GAME_EM)
   {
-    trainerId = SaveBlock2->e.playerTrainerId;
+    trainerId = gameData.SaveBlock2->e.playerTrainerId;
   }
 
-  u32 tti =
+  u16 trainerIdNum =
       (trainerId[1] << 8)
     | (trainerId[0]);
 
-  sendU32(tti);
+  u16 secretIdNum =
+      (trainerId[3] << 8)
+    | (trainerId[2]);
+
+  sendU32(trainerIdNum);
   waitForAck();
 
   // Does the player want to import this game?
@@ -120,22 +123,22 @@ int main(void)
   u8* pokedexSeen = 0;
   if (GAME_RS)
   {
-    pokedexSeen = SaveBlock2->rs.pokedex.seen;
+    pokedexSeen = gameData.SaveBlock2->rs.pokedex.seen;
   } else if (GAME_FRLG)
   {
-    pokedexSeen = SaveBlock2->frlg.pokedex.seen;
+    pokedexSeen = gameData.SaveBlock2->frlg.pokedex.seen;
   } else if (GAME_EM)
   {
-    pokedexSeen = SaveBlock2->e.pokedex.seen;
+    pokedexSeen = gameData.SaveBlock2->e.pokedex.seen;
   }
 
   for (int i=0; i<13; i++)
   {
     u32 psi =
-        (pokedexSeen[i*4])
-      | (pokedexSeen[i*4+1] << 8)
-      | (pokedexSeen[i*4+2] << 16)
-      | (pokedexSeen[i*4+3] << 24);
+        (pokedexSeen[i*4]   << 24)
+      | (pokedexSeen[i*4+1] << 16)
+      | (pokedexSeen[i*4+2] << 8)
+      | (pokedexSeen[i*4+3]);
 
     directSendU32(psi);
   }
@@ -143,23 +146,54 @@ int main(void)
   u8* pokedexCaught = 0;
   if (GAME_RS)
   {
-    pokedexCaught = SaveBlock2->rs.pokedex.owned;
+    pokedexCaught = gameData.SaveBlock2->rs.pokedex.owned;
   } else if (GAME_FRLG)
   {
-    pokedexCaught = SaveBlock2->frlg.pokedex.owned;
+    pokedexCaught = gameData.SaveBlock2->frlg.pokedex.owned;
   } else if (GAME_EM)
   {
-    pokedexCaught = SaveBlock2->e.pokedex.owned;
+    pokedexCaught = gameData.SaveBlock2->e.pokedex.owned;
   }
 
   for (int i=0; i<13; i++)
   {
     u32 psi =
-        (pokedexCaught[i*4])
-      | (pokedexCaught[i*4+1] << 8)
-      | (pokedexCaught[i*4+2] << 16)
-      | (pokedexCaught[i*4+3] << 24);
+        (pokedexCaught[i*4]   << 24)
+      | (pokedexCaught[i*4+1] << 16)
+      | (pokedexCaught[i*4+2] << 8)
+      | (pokedexCaught[i*4+3]);
 
     directSendU32(psi);
+  }
+
+  // Start sending over party pokémon.
+  struct Pokemon* playerParty = 0;
+  if (GAME_RS)
+  {
+    playerParty = gameData.SaveBlock1->rs.playerParty;
+  } else if (GAME_FRLG)
+  {
+    playerParty = gameData.SaveBlock1->frlg.playerParty;
+  } else if (GAME_EM)
+  {
+    playerParty = gameData.SaveBlock1->e.playerParty;
+  }
+
+  waitForResponse();
+
+  u32 partyCount = 1;
+
+  sendU32(partyCount);
+  waitForAck();
+
+  for (int pki=0; pki<partyCount; pki++)
+  {
+    struct Pokemon* pkm = (playerParty + pki);
+    struct BoxPokemon* bpkm = &(pkm->box);
+
+    struct PokemonIntermediate pki;
+
+    PokemonIntermediateInit(&pki, bpkm, trainerIdNum, secretIdNum, &gameData);
+    PokemonIntermediateStream(&pki);
   }
 }

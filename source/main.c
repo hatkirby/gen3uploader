@@ -13,6 +13,7 @@
 #include "link.h"
 #include "encoding.h"
 #include "multiboot.h"
+#include "pokemon.h"
 
 void printmain()
 {
@@ -203,6 +204,59 @@ void* extractor(void* userdata)
     }
 
     printf("\n");
+
+    sendMsg(1);
+
+    // Start receiving party pokémon.
+    printf("Getting party...\n");
+
+    u32 partyCount = getMsg();
+
+    for (u32 i = 0; i < partyCount; i++)
+    {
+      u32 rawdata[sizeof(struct PokemonIntermediate) / 4];
+      getMsgArr(rawdata, sizeof(struct PokemonIntermediate) / 4);
+
+      struct PokemonIntermediate* pki = (struct PokemonIntermediate*)(&rawdata);
+
+      printf("Species: %d\n", __builtin_bswap16(pki->species));
+
+      u8* pokename = pki->nickname;
+      printf("Nickname: ");
+
+      for (int i = 0; i < 10; i++)
+      {
+        if (pokename[i] == 0xFF)
+        {
+          break;
+        } else {
+          printf("%c", debugGen3Decode(pokename[i]));
+        }
+      }
+
+      printf("\nOT: ");
+
+      for (int i=0; i<7; i++)
+      {
+        if (pki->otName[i] == 0xFF)
+        {
+          break;
+        } else {
+          printf("%c", debugGen3Decode(pki->otName[i]));
+        }
+      }
+
+      printf("\n");
+      printf("Level: %d\n", pki->level);
+      printf("HP: %ld\n", __builtin_bswap32(pki->hp));
+      printf("Attack: %ld\n", __builtin_bswap32(pki->attack));
+      printf("Defense: %ld\n", __builtin_bswap32(pki->defense));
+      printf("Special Attack: %ld\n", __builtin_bswap32(pki->spAttack));
+      printf("Special Defense: %ld\n", __builtin_bswap32(pki->spDefense));
+      printf("Speed: %ld\n", __builtin_bswap32(pki->speed));
+
+      printf("\n");
+    }
 
     waitForButtons(PAD_BUTTON_START);
   }
