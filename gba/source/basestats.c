@@ -6,6 +6,7 @@
  * of the MIT license.  See the LICENSE file for details.
  */
 #include "basestats.h"
+#include "gamedata.h"
 
 enum {
     GROWTH_MEDIUM_FAST,
@@ -1655,7 +1656,7 @@ const struct SmallBaseStats gSmallBaseStats[] = {
         100, 100, 100, 100, 100, 100,
         255, // gender
         GROWTH_SLOW
-    }, { // Deoxys
+    }, { // Deoxys Normal Forme
         50, 150, 50, 150, 150, 50,
         255, // gender
         GROWTH_SLOW
@@ -1665,3 +1666,41 @@ const struct SmallBaseStats gSmallBaseStats[] = {
         GROWTH_FAST
     }
 };
+
+const struct SmallBaseStats gDeoxysBaseStats[] = {
+  { // Attack Forme
+    50, 180, 20, 180, 20, 150,
+    255, // gender
+    GROWTH_SLOW
+  }, { // Defense Forme
+    50, 70, 160, 70, 160, 90,
+    255, // gender
+    GROWTH_SLOW
+  }, { // Speed Forme
+    50, 95, 90, 95, 90, 180,
+    255, // gender
+    GROWTH_SLOW
+  }
+};
+
+const struct SmallBaseStats* BaseStatsForSpecies(int species)
+{
+  if ((species == DEOXYS_SPECIES_INDEX) && (!GAME_RS))
+  {
+    if (GAME_FR)
+    {
+      return &gDeoxysBaseStats[0];
+    } else if (GAME_LG)
+    {
+      return &gDeoxysBaseStats[1];
+    } else if (GAME_EM)
+    {
+      return &gDeoxysBaseStats[2];
+    } else {
+      // Impossible.
+      return 0;
+    }
+  } else {
+    return &gSmallBaseStats[species];
+  }
+}

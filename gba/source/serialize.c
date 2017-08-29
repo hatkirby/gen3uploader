@@ -11,9 +11,6 @@
 #include "exptables.h"
 #include "dexorder.h"
 
-#define UNOWN_SPECIES_INDEX 201
-#define SHEDINJA_SPECIES_INDEX 303
-
 enum Stat {
   StatAttack,
   StatDefense,
@@ -63,7 +60,7 @@ void PokemonIntermediateInit(
   struct PokemonSubstruct2* sub2 = GetBoxPokemonSubstruct2(bpkm);
   struct PokemonSubstruct3* sub3 = GetBoxPokemonSubstruct3(bpkm);
 
-  const struct SmallBaseStats* baseStats = &gSmallBaseStats[sub0->species];
+  const struct SmallBaseStats* baseStats = BaseStatsForSpecies(sub0->species);
 
   for (int i=0; i<POKEMON_NAME_LENGTH; i++)
   {

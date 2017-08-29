@@ -10,6 +10,10 @@
 
 #include <gba.h>
 
+#define UNOWN_SPECIES_INDEX 201
+#define SHEDINJA_SPECIES_INDEX 303
+#define DEOXYS_SPECIES_INDEX 410
+
 struct SmallBaseStats {
   u8 baseHP;
   u8 baseAttack;
@@ -21,6 +25,6 @@ struct SmallBaseStats {
   u8 growthRate;
 };
 
-extern const struct SmallBaseStats gSmallBaseStats[];
+const struct SmallBaseStats* BaseStatsForSpecies(int species);
 
 #endif
