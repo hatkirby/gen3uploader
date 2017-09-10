@@ -8,7 +8,12 @@
 #define ENCODING_H_95547384
 
 #include <gccore.h>
+#include "pokemon.h"
 
-char debugGen3Decode(u8 val);
+void decodePokemonCharset(
+  const u8* input,
+  int maxLength,
+  char* output,
+  enum PokemonLanguage language);
 
 #endif /* end of include guard: ENCODING_H_95547384 */

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "link.h"
 #include "encoding.h"
 #include "multiboot.h"
@@ -117,6 +118,7 @@ void* extractor(void* userdata)
 
     printf("\n");
     VIDEO_WaitVSync();
+    sleep(1);
 
     u32 isValid = getMsg();
     if (isValid == -1)
@@ -144,19 +146,13 @@ void* extractor(void* userdata)
     // Get trainer ID
     u32 trainerId = getMsg();
 
-    printf("Trainer: ");
+    // Get game language.
+    enum PokemonLanguage gameLanguage = getMsg();
 
-    for (int i = 0; i < 8; i++)
-    {
-      if (trainerName[i] == 0xFF)
-      {
-        break;
-      } else {
-        printf("%c", debugGen3Decode(trainerName[i]));
-      }
-    }
+    char d_trainerName[25];
+    decodePokemonCharset(trainerName, 8, d_trainerName, gameLanguage);
 
-    printf(" (%ld)\n", trainerId);
+    printf("Trainer: %s (%ld)\n", d_trainerName, trainerId);
 
     // Wait for confirmation.
     printf("Press A to import the data from this game.\n");
@@ -219,34 +215,15 @@ void* extractor(void* userdata)
 
       struct PokemonIntermediate* pki = (struct PokemonIntermediate*)(&rawdata);
 
+      char d_pokename[31];
+      decodePokemonCharset(pki->nickname, 10, d_pokename, pki->language);
+
+      char d_otName[22];
+      decodePokemonCharset(pki->otName, 7, d_otName, pki->language);
+
       printf("Species: %d\n", __builtin_bswap16(pki->species));
-
-      u8* pokename = pki->nickname;
-      printf("Nickname: ");
-
-      for (int i = 0; i < 10; i++)
-      {
-        if (pokename[i] == 0xFF)
-        {
-          break;
-        } else {
-          printf("%c", debugGen3Decode(pokename[i]));
-        }
-      }
-
-      printf("\nOT: ");
-
-      for (int i=0; i<7; i++)
-      {
-        if (pki->otName[i] == 0xFF)
-        {
-          break;
-        } else {
-          printf("%c", debugGen3Decode(pki->otName[i]));
-        }
-      }
-
-      printf("\n");
+      printf("Nickname: %s\n", d_pokename);
+      printf("OT: %s\n", d_otName);
       printf("Level: %d\n", pki->level);
       printf("HP: %ld\n", __builtin_bswap32(pki->hp));
       printf("Attack: %ld\n", __builtin_bswap32(pki->attack));

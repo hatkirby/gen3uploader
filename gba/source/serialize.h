@@ -17,8 +17,7 @@ void PokemonIntermediateInit(
   struct PokemonIntermediate* pki,
   struct BoxPokemon* bpkm,
   u16 trainerId,
-  u16 secretId,
-  const struct GameData* gameData);
+  u16 secretId);
 
 void PokemonIntermediateStream(struct PokemonIntermediate* pki);
 

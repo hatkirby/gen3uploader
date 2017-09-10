@@ -12,7 +12,7 @@
 
 //from my tests 50us seems to be the lowest
 //safe si transfer delay in between calls
-#define SI_TRANS_DELAY 50
+#define SI_TRANS_DELAY 500
 
 static u8* resbuf;
 static u8* cmdbuf;
@@ -61,7 +61,7 @@ u32 recv()
   SI_Transfer(1, cmdbuf, 1, resbuf, 5, transcb, SI_TRANS_DELAY);
 
   while (transval == 0);
-  printf("%08lx\n", *(vu32*)resbuf);
+  //printf("%08lx\n", *(vu32*)resbuf);
   return *(vu32*)resbuf;
 }
 
@@ -82,14 +82,7 @@ void send(u32 msg)
 
 u32 getMsg()
 {
-  u32 val = 0;
-  while (val == 0)
-  {
-    val = __builtin_bswap32(recv());
-  }
-
-  send(0);
-  while (recv()!=0);
+  u32 val = __builtin_bswap32(recv());
   send(0);
 
   return val;
@@ -105,10 +98,7 @@ void getMsgArr(u32* arr, int len)
 
 void sendMsg(u32 msg)
 {
-  while (recv()==0);
   send(msg);
-  while (recv()!=0);
-  send(0);
 }
 
 void waitForGBA()
@@ -157,5 +147,4 @@ void waitForGame()
 void waitForAck()
 {
   while (recv() != 0) {sleep(1);}
-  send(0);
 }

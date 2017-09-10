@@ -11,14 +11,6 @@
 #include "exptables.h"
 #include "dexorder.h"
 
-enum Stat {
-  StatAttack,
-  StatDefense,
-  StatSpeed,
-  StatSpAttack,
-  StatSpDefense
-};
-
 u32 CalculateStat(
   u8 base,
   u32 iv,
@@ -50,8 +42,7 @@ void PokemonIntermediateInit(
   struct PokemonIntermediate* pki,
   struct BoxPokemon* bpkm,
   u16 trainerId,
-  u16 secretId,
-  const struct GameData* gameData)
+  u16 secretId)
 {
   DecryptBoxPokemon(bpkm);
 
@@ -88,6 +79,7 @@ void PokemonIntermediateInit(
   pki->metLocation = sub3->metLocation;
   pki->pokeball = sub3->pokeball;
   pki->altAbility = sub3->altAbility;
+  pki->language = bpkm->language & 3;
 
   // Derive nature from the personality value.
   pki->nature = (bpkm->personality % 25);

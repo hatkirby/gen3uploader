@@ -11,6 +11,15 @@
 #define OT_NAME_LENGTH 7
 #define TILE_SIZE_4BPP 32
 
+enum PokemonLanguage {
+  Japanese = 1,
+  English = 2,
+  French = 3,
+  Italian = 4,
+  German = 5,
+  Spanish = 7
+};
+
 struct PokemonIntermediate {
   u32 otId;
   u32 experience;
@@ -35,7 +44,9 @@ struct PokemonIntermediate {
   u8 nickname[POKEMON_NAME_LENGTH];
   u8 otName[OT_NAME_LENGTH];
   u8 pokeball;
-  u8 altAbility; // waste of space but nothing to pack it with
+  u8 language:3;
+  u8 altAbility:1;
+  u8 filler:4; // waste of space but nothing to pack it with
 
   // the following values are generated from the personality value.
   u8 nature:6;

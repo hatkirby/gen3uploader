@@ -113,6 +113,21 @@ int main(void)
   sendU32(trainerIdNum);
   waitForAck();
 
+  // Send cart language.
+  u8 cartLang = 0;
+  switch (*(u8*)(0x80000AF))
+  {
+    case 'J': cartLang = Japanese; break;
+    case 'E': cartLang = English; break;
+    case 'F': cartLang = French; break;
+    case 'I': cartLang = Italian; break;
+    case 'D': cartLang = German; break;
+    case 'S': cartLang = Spanish; break;
+  }
+
+  sendU32(cartLang);
+  waitForAck();
+
   // Does the player want to import this game?
   if (waitForResponse() == 0)
   {
@@ -193,7 +208,7 @@ int main(void)
 
     struct PokemonIntermediate pki;
 
-    PokemonIntermediateInit(&pki, bpkm, trainerIdNum, secretIdNum, &gameData);
+    PokemonIntermediateInit(&pki, bpkm, trainerIdNum, secretIdNum);
     PokemonIntermediateStream(&pki);
   }
 }
