@@ -10,6 +10,7 @@
 #include "basestats.h"
 #include "exptables.h"
 #include "dexorder.h"
+#include "sha2.h"
 
 u32 CalculateStat(
   u8 base,
@@ -51,6 +52,16 @@ void PokemonIntermediateInit(
   struct PokemonSubstruct2* sub2 = GetBoxPokemonSubstruct2(bpkm);
   struct PokemonSubstruct3* sub3 = GetBoxPokemonSubstruct3(bpkm);
 
+  u32 identifier[3];
+  identifier[0] = bpkm->otId;             // original trainer
+  identifier[1] = bpkm->personality;      // personality value
+  identifier[2] = ((const u32*)sub3)[1];  // IVs (plus two non-random bits)
+
+  sha224(
+    (const unsigned char*)identifier,
+    12,
+    (unsigned char*)pki->key);
+
   const struct SmallBaseStats* baseStats = BaseStatsForSpecies(sub0->species);
 
   for (int i=0; i<POKEMON_NAME_LENGTH; i++)
@@ -63,7 +74,7 @@ void PokemonIntermediateInit(
     pki->otName[i] = bpkm->otName[i];
   }
 
-  pki->otId = bpkm->otId;
+  pki->otId = bpkm->otId & 0x0000FFFF;
   pki->otGender = sub3->otGender;
   pki->species = gSpeciesToNationalPokedexNum[sub0->species - 1];
   pki->heldItem = sub0->heldItem;

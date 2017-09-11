@@ -210,6 +210,8 @@ void* extractor(void* userdata)
 
     for (u32 i = 0; i < partyCount; i++)
     {
+      usleep(5000);
+
       u32 rawdata[sizeof(struct PokemonIntermediate) / 4];
       getMsgArr(rawdata, sizeof(struct PokemonIntermediate) / 4);
 
@@ -221,6 +223,18 @@ void* extractor(void* userdata)
       char d_otName[22];
       decodePokemonCharset(pki->otName, 7, d_otName, pki->language);
 
+      char d_key[57];
+      sprintf(
+        d_key,
+        "%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
+        pki->key[0],
+        pki->key[1],
+        pki->key[2],
+        pki->key[3],
+        pki->key[4],
+        pki->key[5],
+        pki->key[6]);
+
       printf("Species: %d\n", __builtin_bswap16(pki->species));
       printf("Nickname: %s\n", d_pokename);
       printf("OT: %s\n", d_otName);
@@ -231,6 +245,7 @@ void* extractor(void* userdata)
       printf("Special Attack: %ld\n", __builtin_bswap32(pki->spAttack));
       printf("Special Defense: %ld\n", __builtin_bswap32(pki->spDefense));
       printf("Speed: %ld\n", __builtin_bswap32(pki->speed));
+      printf("Key: %s\n", d_key);
 
       printf("\n");
     }
