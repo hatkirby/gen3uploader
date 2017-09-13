@@ -91,6 +91,7 @@ void PokemonIntermediateInit(
   pki->pokeball = sub3->pokeball;
   pki->altAbility = sub3->altAbility;
   pki->language = bpkm->language & 7;
+  pki->orre = (sub3->metGame == 15);
 
   // Derive nature from the personality value.
   pki->nature = (bpkm->personality % 25);

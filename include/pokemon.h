@@ -62,7 +62,8 @@ struct __attribute__((aligned(4))) PokemonIntermediate {
   u8 pokeball;
   u8 language:3;
   u8 altAbility:1;
-  u8 filler:4; // waste of space but nothing to pack it with
+  u8 orre:1;
+  u8 filler:3; // waste of space but nothing to pack it with
 
   // the following values are generated from the personality value.
   u8 nature:6;
