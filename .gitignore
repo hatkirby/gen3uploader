@@ -6,3 +6,5 @@ tags
 *.o
 *.d
 *.swp
+*.swo
+.DS_Store

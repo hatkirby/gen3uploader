@@ -11,10 +11,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fat.h>
+#include "cJSON.h"
 #include "link.h"
 #include "encoding.h"
 #include "multiboot.h"
 #include "pokemon.h"
+#include "http.h"
+#include "netinf.h"
 
 void printmain()
 {
@@ -65,8 +69,75 @@ void fatalError(char *msg)
   exit(0);
 }
 
+cJSON* getConfig()
+{
+  FILE* fp = fopen("/gen3uploader.cfg", "r");
+  if (!fp)
+  {
+    fatalError("ERROR: Could not find config file!\n");
+  }
+
+  fseek(fp, 0L, SEEK_END);
+  long lSize = ftell(fp);
+  rewind(fp);
+
+  char* buffer = calloc(1, lSize+1);
+  if (!buffer)
+  {
+    fclose(fp);
+    fatalError("ERROR: Could not allocate memory.\n");
+  }
+
+  if (fread(buffer, lSize, 1, fp) != 1)
+  {
+    fclose(fp);
+    free(buffer);
+    fatalError("ERROR: Could not read config file.\n");
+  }
+
+  cJSON* config = cJSON_Parse(buffer);
+
+  fclose(fp);
+  free(buffer);
+
+  return config;
+}
+
 void* extractor(void* userdata)
 {
+  cJSON* config = (cJSON*)userdata;
+
+  WOLFSSL_CTX* sslContext = 0;
+  if (cJSON_HasObjectItem(config, "certificate"))
+  {
+    wolfSSL_Init();
+
+    sslContext = wolfSSL_CTX_new(wolfTLSv1_client_method());
+    if (sslContext == NULL)
+    {
+      fatalError("wolfSSL_CTX_new error.\n");
+    }
+
+    if (wolfSSL_CTX_load_verify_locations(
+      sslContext,
+      cJSON_GetObjectItem(config, "certificate")->valuestring,
+      0) != SSL_SUCCESS)
+    {
+      fatalError("Error loading certificate file.\n");
+    }
+  }
+
+  while (!initializeNetwork())
+  {
+    printf("Could not initialize network.\n");
+    printf("Press A to try again, press B to exit.\n");
+
+    if (waitForButtons(PAD_BUTTON_A | PAD_BUTTON_B) == PAD_BUTTON_B)
+    {
+      endproc();
+    }
+  }
+
   for (;;)
   {
     printmain();
@@ -174,6 +245,17 @@ void* extractor(void* userdata)
 
     sendMsg(1);
 
+    cJSON* root = cJSON_CreateObject();
+
+    cJSON_AddItemToObject(
+      root,
+      "playerName",
+      cJSON_CreateString(d_trainerName));
+
+    cJSON_AddNumberToObject(root, "playerId", trainerId);
+    cJSON_AddNumberToObject(root, "gameId", gameId);
+    cJSON_AddNumberToObject(root, "language", gameLanguage);
+
     // Get Pokédex data
     u32 pokedexSeen[13];
     u32 pokedexCaught[13];
@@ -208,6 +290,8 @@ void* extractor(void* userdata)
 
     u32 partyCount = getMsg();
 
+    cJSON* jParty = cJSON_CreateArray();
+
     for (u32 i = 0; i < partyCount; i++)
     {
       usleep(5000);
@@ -235,22 +319,144 @@ void* extractor(void* userdata)
         pki->key[5],
         pki->key[6]);
 
-      printf("Species: %d\n", __builtin_bswap16(pki->species));
-      printf("Nickname: %s\n", d_pokename);
-      printf("OT: %s\n", d_otName);
-      printf("Level: %d\n", pki->level);
-      printf("HP: %ld\n", __builtin_bswap32(pki->hp));
-      printf("Attack: %ld\n", __builtin_bswap32(pki->attack));
-      printf("Defense: %ld\n", __builtin_bswap32(pki->defense));
-      printf("Special Attack: %ld\n", __builtin_bswap32(pki->spAttack));
-      printf("Special Defense: %ld\n", __builtin_bswap32(pki->spDefense));
-      printf("Speed: %ld\n", __builtin_bswap32(pki->speed));
-      printf("Key: %s\n", d_key);
+      cJSON* jPoke = cJSON_CreateObject();
 
-      printf("\n");
+      cJSON_AddNumberToObject(
+        jPoke,
+        "species",
+        __builtin_bswap16(pki->species));
+
+      cJSON_AddItemToObject(
+        jPoke,
+        "nickname",
+        cJSON_CreateString(d_pokename));
+
+      cJSON_AddItemToObject(
+        jPoke,
+        "otName",
+        cJSON_CreateString(d_otName));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "otId",
+        __builtin_bswap16(pki->otId));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "level",
+        pki->level);
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "hp",
+        __builtin_bswap32(pki->hp));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "attack",
+        __builtin_bswap32(pki->attack));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "defense",
+        __builtin_bswap32(pki->defense));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "speed",
+        __builtin_bswap32(pki->speed));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "spAttack",
+        __builtin_bswap32(pki->spAttack));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "spDefense",
+        __builtin_bswap32(pki->spDefense));
+
+      cJSON_AddItemToObject(
+        jPoke,
+        "key",
+        cJSON_CreateString(d_key));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "experience",
+        __builtin_bswap32(pki->experience));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "heldItem",
+        __builtin_bswap16(pki->heldItem));
+
+      cJSON* jMoves = cJSON_CreateArray();
+
+      for (int j=0; j<4; j++)
+      {
+        if (pki->moves[j] != 0)
+        {
+          cJSON* jMove = cJSON_CreateObject();
+
+          cJSON_AddNumberToObject(
+            jMove,
+            "id",
+            __builtin_bswap16(pki->moves[j]));
+
+          cJSON_AddNumberToObject(
+            jMove,
+            "ppBonuses",
+            (pki->ppBonuses >> (2*j)) & 3);
+
+          cJSON_AddItemToArray(jMoves, jMove);
+        } else {
+          break;
+        }
+      }
+
+      cJSON_AddItemToObject(
+        jPoke,
+        "moves",
+        jMoves);
+
+      if (pki->otGender)
+      {
+        cJSON_AddStringToObject(jPoke, "otGender", "female");
+      } else {
+        cJSON_AddStringToObject(jPoke, "otGender", "male");
+      }
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "metLevel",
+        pki->metLevel);
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "metLocation",
+        pki->metLocation);
+
+      cJSON_AddItemToArray(jParty, jPoke);
     }
 
-    waitForButtons(PAD_BUTTON_START);
+    cJSON_AddItemToObject(root, "party", jParty);
+
+    char *rendered = cJSON_Print(root);
+    printf("%s\n", rendered);
+
+    waitForButtons(PAD_BUTTON_A);
+
+    int result = submitToApi(
+      cJSON_GetObjectItem(config, "url")->valuestring,
+      sslContext,
+      root,
+      cJSON_GetObjectItem(config, "username")->valuestring,
+      cJSON_GetObjectItem(config, "password")->valuestring);
+
+    printf("Result: %d\n", result);
+
+    waitForButtons(PAD_BUTTON_A);
   }
 
   return NULL;
@@ -276,6 +482,14 @@ int main(int argc, char *argv[])
   VIDEO_ClearFrameBuffer(rmode, xfb, COLOR_BLACK);
   PAD_Init();
 
+  if (!fatInitDefault())
+  {
+    printmain();
+    fatalError("ERROR: Cannot find config file!\n");
+  }
+
+  cJSON* config = getConfig();
+
   initLink();
 
   lwp_t extractorHandle = (lwp_t)NULL;
@@ -283,7 +497,7 @@ int main(int argc, char *argv[])
   LWP_CreateThread(
     &extractorHandle,   // thread handle
     extractor,          // code
-    NULL,               // userdata
+    config,             // userdata
     NULL,               // stack base
     16*1024,            // stack size
     LWP_PRIO_HIGHEST);  // thread priority

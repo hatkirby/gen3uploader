@@ -7,7 +7,22 @@ The multiboot image that the Wii sends to the GBA is executed in the context of 
 
 One of the main reasons that I chose to use this method to extract save data from my GBA games is that I'm very concerned about the "legitimacy" of my Pokémon experience. I don't want to be able to do anything with my saves that could be considered cheating. Thus, the multiboot image only sends to the Wii information that is publicly visible using the game's interface. For instance, the Wii never receives a Pokémon's IVs, EVs, or full personality value. The GBA multiboot image derives all the necessary information (stats, Nature, gender, shininess, Unown letter, etc) from those values, and then sends that over the connection. In this way, this private information never leaves the context of the GBA's code.
 
-This project is still in active development, and currently only displays debug information on the Wii's screen. No data is sent to a website yet.
+This project is still in active development, and is not yet ready to be used.
+
+# Compiling
+`gen3uploader` depends on wolfSSL in order to negotiate HTTPS connections. The main branch has a couple of minor problems that prevent it from working with this project right out of the box, so for now you should use the [devkitpro branch in hatkirby/wolfssl](/hatkirby/wolfssl/tree/devkitpro).
+
+In order to compile wolfSSL, first ensure your $DEVKITPPC environment variable is set. Then, assuming that $GEN3UPLOADER points to your `gen3uploader` repository, you can run the following commands:
+
+```bash
+./autogen.sh
+./configure --disable-shared CC=$DEVKITPPC/bin/powerpc-eabi-gcc --host=ppc --enable-singlethreaded RANLIB=$DEVKITPPC/bin/powerpc-eabi-gcc-ranlib CFLAGS="-DDEVKITPRO -DNO_WRITEV" --disable-examples --disable-crypttests
+make
+cp src/.libs/libwolfssl.a $GEN3UPLOADER/vendor/lib/
+cp -r wolfssl $GEN3UPLOADER/vendor/include/
+```
+
+From there, you should be able to run the `build.sh` script in the `gen3uploader` project to compile everything.
 
 # Usage
 Have a GC Controller in Port 1 and a GBA with Gen3 game in Port 2. Run the Wii program, and follow the instructions. The connection is not very stable, and it can take several tries for the program to run successfully.

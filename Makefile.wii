@@ -19,7 +19,7 @@ TARGET		:=	gen3uploader_wii
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=	source include
+INCLUDES	:=	source include vendor/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -33,14 +33,14 @@ LDFLAGS	= -g $(MACHDEP) -Wl,-Map,$(notdir $@).map
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -logc
+LIBS	:= -lfat -logc -lwolfssl -lm
 
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(DEVKITPPC)/lib $(CURDIR)
+LIBDIRS	:= $(DEVKITPPC)/lib $(CURDIR) $(CURDIR)/vendor
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
