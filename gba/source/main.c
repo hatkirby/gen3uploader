@@ -106,10 +106,6 @@ int main(void)
       (trainerId[1] << 8)
     | (trainerId[0]);
 
-  u16 secretIdNum =
-      (trainerId[3] << 8)
-    | (trainerId[2]);
-
   sendU32(trainerIdNum);
   waitForAck();
 
@@ -208,7 +204,7 @@ int main(void)
 
     struct PokemonIntermediate pki;
 
-    PokemonIntermediateInit(&pki, bpkm, trainerIdNum, secretIdNum);
+    PokemonIntermediateInit(&pki, bpkm);
     PokemonIntermediateStream(&pki);
   }
 }

@@ -41,9 +41,7 @@ u32 CalculateStat(
 
 void PokemonIntermediateInit(
   struct PokemonIntermediate* pki,
-  struct BoxPokemon* bpkm,
-  u16 trainerId,
-  u16 secretId)
+  struct BoxPokemon* bpkm)
 {
   DecryptBoxPokemon(bpkm);
 
@@ -120,10 +118,10 @@ void PokemonIntermediateInit(
   }
 
   // Determine shininess from the personality value.
-  u16 shinyDeterminer =
-      (trainerId)
-    ^ (secretId)
-    ^ ((bpkm->personality >> 16) & 0x0000FFFF)
+  u32 shinyDeterminer =
+      ((bpkm->otId & 0xFFFF0000) >> 16)
+    ^ (bpkm->otId & 0x0000FFFF)
+    ^ ((bpkm->personality & 0xFFFF0000) >> 16)
     ^ (bpkm->personality & 0x0000FFFF);
 
   if (shinyDeterminer < 8)
