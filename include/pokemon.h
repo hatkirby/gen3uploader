@@ -63,12 +63,9 @@ struct __attribute__((aligned(4))) PokemonIntermediate {
   u8 language:3;
   u8 altAbility:1;
   u8 orre:1;
-  u8 filler:3; // waste of space but nothing to pack it with
-
-  // the following values are generated from the personality value.
-  u8 nature:6;
-  u8 gender:1;
+  u8 gender:2;
   u8 shiny:1;
+  u8 nature;
   u8 unownLetter;
 
   // the level is calculated from the species and experience. this is mostly

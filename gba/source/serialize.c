@@ -99,7 +99,10 @@ void PokemonIntermediateInit(
   // Derive gender from the personality value.
   int genderThreshold = baseStats->genderRatio;
 
-  if ((genderThreshold == 0) || (genderThreshold == 255))
+  if (genderThreshold == 255)
+  {
+    pki->gender = 2;
+  } else if (genderThreshold == 0)
   {
     pki->gender = 0;
   } else if (genderThreshold == 254)
