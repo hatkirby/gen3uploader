@@ -332,7 +332,7 @@ void decodePokemonCharset(
       // left white corner bracket
       if (language == Japanese)
       {
-        next = "\xe3\x80\x83";
+        next = "\xe3\x80\x8e";
       }
       // double low-9 quotation mark
       else if (language == German)
