@@ -376,6 +376,36 @@ void* extractor(void* userdata)
         "spDefense",
         __builtin_bswap32(pki->spDefense));
 
+      cJSON_AddNumberToObject(
+        jPoke,
+        "coolness",
+        __builtin_bswap32(pki->cool));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "beauty",
+        __builtin_bswap32(pki->beauty));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "cuteness",
+        __builtin_bswap32(pki->cute));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "smartness",
+        __builtin_bswap32(pki->smart));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "toughness",
+        __builtin_bswap32(pki->tough));
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "sheen",
+        __builtin_bswap32(pki->sheen));
+
       cJSON_AddItemToObject(
         jPoke,
         "key",
@@ -437,10 +467,45 @@ void* extractor(void* userdata)
         "metLocation",
         pki->metLocation);
 
+      cJSON_AddBoolToObject(
+        jPoke,
+        "shiny",
+        pki->shiny);
+
+      cJSON_AddNumberToObject(
+        jPoke,
+        "nature",
+        pki->nature);
+
+      if (pki->gender == 0)
+      {
+        cJSON_AddStringToObject(jPoke, "gender", "male");
+      } else if (pki->gender == 1)
+      {
+        cJSON_AddStringToObject(jPoke, "gender", "female");
+      } else if (pki->gender == 2)
+      {
+        cJSON_AddStringToObject(jPoke, "gender", "genderless");
+      }
+
+      cJSON_AddBoolToObject(
+        jPoke,
+        "secondAbility",
+        pki->altAbility);
+
+      // Handle Unown form.
+      if (pki->species == 201)
+      {
+        cJSON_AddNumberToObject(
+          jPoke,
+          "unownLetter",
+          pki->unownLetter);
+      }
+
       cJSON_AddItemToArray(jParty, jPoke);
     }
 
-    cJSON_AddItemToObject(root, "party", jParty);
+    cJSON_AddItemToObject(root, "pokemon", jParty);
 
     char *rendered = cJSON_Print(root);
     printf("%s\n", rendered);
