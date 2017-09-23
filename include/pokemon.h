@@ -54,17 +54,17 @@ struct __attribute__((aligned(4))) PokemonIntermediate {
   u16 otId; // only the lower 2 bytes, because the upper 2 are secret
 
   u8 ppBonuses;
-  u8 otGender:1;
-  u8 metLevel:7;
+  u8 otGender;
+  u8 metLevel;
   u8 metLocation;
   u8 nickname[POKEMON_NAME_LENGTH];
   u8 otName[OT_NAME_LENGTH];
   u8 pokeball;
-  u8 language:3;
-  u8 altAbility:1;
-  u8 orre:1;
-  u8 gender:2;
-  u8 shiny:1;
+  u8 language;
+  u8 altAbility;
+  u8 gender;
+  u8 orre;
+  u8 shiny;
   u8 nature;
   u8 unownLetter;
 
