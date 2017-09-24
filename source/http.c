@@ -58,7 +58,7 @@ static int tcpWrite(
       result = net_write(*(s32*)firstParam, buffer, block);
     }
 
-    if ((result == 0) || (result == -56))
+    if ((result == 0) || (result == -56) || (result == -11))
     {
       usleep(20 * 1000);
 
@@ -73,7 +73,7 @@ static int tcpWrite(
     sent += result;
     left -= result;
     buffer += result;
-    usleep(100);
+    usleep(1000);
 
     if ((sent / TCP_BLOCK_SIZE) > step)
     {

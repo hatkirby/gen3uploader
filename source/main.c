@@ -19,6 +19,7 @@
 #include "pokemon.h"
 #include "http.h"
 #include "netinf.h"
+#include "deserialize.h"
 
 void printmain()
 {
@@ -285,7 +286,7 @@ void* extractor(void* userdata)
 
     sendMsg(1);
 
-    // Start receiving party pokémon.
+    // Start receiving pokémon.
     printf("Getting party...\n");
 
     u32 partyCount = getMsg();
@@ -301,214 +302,49 @@ void* extractor(void* userdata)
 
       struct PokemonIntermediate* pki = (struct PokemonIntermediate*)(&rawdata);
 
-      char d_pokename[31];
-      decodePokemonCharset(pki->nickname, 10, d_pokename, pki->language);
+      cJSON* jPoke = pokemonToJson(pki);
 
-      char d_otName[22];
-      decodePokemonCharset(pki->otName, 7, d_otName, pki->language);
-
-      char d_key[57];
-      sprintf(
-        d_key,
-        "%08lx%08lx%08lx%08lx%08lx%08lx%08lx",
-        pki->key[0],
-        pki->key[1],
-        pki->key[2],
-        pki->key[3],
-        pki->key[4],
-        pki->key[5],
-        pki->key[6]);
-
-      cJSON* jPoke = cJSON_CreateObject();
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "species",
-        __builtin_bswap16(pki->species));
-
-      cJSON_AddItemToObject(
-        jPoke,
-        "nickname",
-        cJSON_CreateString(d_pokename));
-
-      cJSON_AddItemToObject(
-        jPoke,
-        "otName",
-        cJSON_CreateString(d_otName));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "otId",
-        __builtin_bswap16(pki->otId));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "level",
-        pki->level);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "hp",
-        __builtin_bswap32(pki->hp));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "attack",
-        __builtin_bswap32(pki->attack));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "defense",
-        __builtin_bswap32(pki->defense));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "speed",
-        __builtin_bswap32(pki->speed));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "spAttack",
-        __builtin_bswap32(pki->spAttack));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "spDefense",
-        __builtin_bswap32(pki->spDefense));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "coolness",
-        pki->cool);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "beauty",
-        pki->beauty);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "cuteness",
-        pki->cute);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "smartness",
-        pki->smart);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "toughness",
-        pki->tough);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "sheen",
-        pki->sheen);
-
-      cJSON_AddItemToObject(
-        jPoke,
-        "key",
-        cJSON_CreateString(d_key));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "experience",
-        __builtin_bswap32(pki->experience));
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "heldItem",
-        __builtin_bswap16(pki->heldItem));
-
-      cJSON* jMoves = cJSON_CreateArray();
-
-      for (int j=0; j<4; j++)
-      {
-        if (pki->moves[j] != 0)
-        {
-          cJSON* jMove = cJSON_CreateObject();
-
-          cJSON_AddNumberToObject(
-            jMove,
-            "id",
-            __builtin_bswap16(pki->moves[j]));
-
-          cJSON_AddNumberToObject(
-            jMove,
-            "ppBonuses",
-            (pki->ppBonuses >> (2*j)) & 3);
-
-          cJSON_AddItemToArray(jMoves, jMove);
-        } else {
-          break;
-        }
-      }
-
-      cJSON_AddItemToObject(
-        jPoke,
-        "moves",
-        jMoves);
-
-      if (pki->otGender)
-      {
-        cJSON_AddStringToObject(jPoke, "otGender", "female");
-      } else {
-        cJSON_AddStringToObject(jPoke, "otGender", "male");
-      }
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "metLevel",
-        pki->metLevel);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "metLocation",
-        pki->metLocation);
-
-      cJSON_AddBoolToObject(
-        jPoke,
-        "shiny",
-        pki->shiny);
-
-      cJSON_AddNumberToObject(
-        jPoke,
-        "nature",
-        pki->nature);
-
-      if (pki->gender == 0)
-      {
-        cJSON_AddStringToObject(jPoke, "gender", "male");
-      } else if (pki->gender == 1)
-      {
-        cJSON_AddStringToObject(jPoke, "gender", "female");
-      } else if (pki->gender == 2)
-      {
-        cJSON_AddStringToObject(jPoke, "gender", "genderless");
-      }
-
-      cJSON_AddBoolToObject(
-        jPoke,
-        "secondAbility",
-        pki->altAbility);
-
-      // Handle Unown form.
-      if (pki->species == 201)
-      {
-        cJSON_AddNumberToObject(
-          jPoke,
-          "unownLetter",
-          pki->unownLetter);
-      }
+      cJSON_AddStringToObject(jPoke, "storage", "party");
+      cJSON_AddNumberToObject(jPoke, "slot", i);
 
       cJSON_AddItemToArray(jParty, jPoke);
+    }
+
+    for (int i=0; i<14; i++)
+    {
+      printf("Getting box %d...\n", i+1);
+
+      for (int j=0; j<30; j++)
+      {
+        int isPoke = getMsg();
+
+        if (isPoke == 1)
+        {
+          usleep(5000);
+
+          u32 rawdata[sizeof(struct PokemonIntermediate) / 4];
+          getMsgArr(rawdata, sizeof(struct PokemonIntermediate) / 4);
+
+          struct PokemonIntermediate* pki =
+            (struct PokemonIntermediate*)(&rawdata);
+
+          cJSON* jPoke = pokemonToJson(pki);
+
+          cJSON_AddStringToObject(jPoke, "storage", "box");
+          cJSON_AddNumberToObject(jPoke, "box", i);
+          cJSON_AddNumberToObject(jPoke, "slot", j);
+
+          cJSON_AddItemToArray(jParty, jPoke);
+        }
+      }
     }
 
     cJSON_AddItemToObject(root, "pokemon", jParty);
 
     char *rendered = cJSON_Print(root);
-    printf("%s\n", rendered);
+    //printf("%s\n", rendered);
+
+    printf("Press A to send.\n");
 
     waitForButtons(PAD_BUTTON_A);
 

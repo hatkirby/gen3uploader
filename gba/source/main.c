@@ -199,14 +199,42 @@ int main(void)
   sendU32(partyCount);
   waitForAck();
 
-  for (int pki=0; pki<partyCount; pki++)
+  for (int ki=0; ki<partyCount; ki++)
   {
-    struct Pokemon* pkm = (playerParty + pki);
+    struct Pokemon* pkm = (playerParty + ki);
     struct BoxPokemon* bpkm = &(pkm->box);
 
     struct PokemonIntermediate pki;
 
     PokemonIntermediateInit(&pki, bpkm);
     PokemonIntermediateStream(&pki);
+  }
+
+  struct PokemonStorage* pc = gameData.SaveBlock3;
+
+  for (int bi=0; bi<14; bi++)
+  {
+    struct BoxPokemon* box = pc->boxes[bi];
+
+    for (int si=0; si<30; si++)
+    {
+      struct BoxPokemon* bpkm = &(box[si]);
+
+      DecryptBoxPokemon(bpkm);
+      struct PokemonSubstruct0* sub0 = GetBoxPokemonSubstruct0(bpkm);
+      bool isPoke = (sub0->species != 0);
+      EncryptBoxPokemon(bpkm);
+
+      sendU32(isPoke);
+      waitForAck();
+
+      if (isPoke)
+      {
+        struct PokemonIntermediate pki;
+
+        PokemonIntermediateInit(&pki, bpkm);
+        PokemonIntermediateStream(&pki);
+      }
+    }
   }
 }
