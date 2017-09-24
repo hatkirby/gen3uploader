@@ -292,6 +292,7 @@ void* extractor(void* userdata)
     u32 partyCount = getMsg();
 
     cJSON* jParty = cJSON_CreateArray();
+    cJSON* jBoxes = cJSON_CreateArray();
 
     for (u32 i = 0; i < partyCount; i++)
     {
@@ -314,8 +315,29 @@ void* extractor(void* userdata)
     {
       printf("Getting box %d...\n", i+1);
 
+      u8 boxName[8];
+
+      u32 bnd = getMsg();
+      boxName[0] = (bnd & 0xFF000000) >> 24;
+      boxName[1] = (bnd & 0x00FF0000) >> 16;
+      boxName[2] = (bnd & 0x0000FF00) >> 8;
+      boxName[3] = (bnd & 0x000000FF);
+
+      bnd = getMsg();
+      boxName[4] = (bnd & 0xFF000000) >> 24;
+      boxName[5] = (bnd & 0x00FF0000) >> 16;
+      boxName[6] = (bnd & 0x0000FF00) >> 8;
+      boxName[7] = (bnd & 0x000000FF);
+
+      char d_boxName[25];
+      decodePokemonCharset(boxName, 9, d_boxName, gameLanguage);
+
+      cJSON_AddItemToArray(jBoxes, cJSON_CreateString(d_boxName));
+
       for (int j=0; j<30; j++)
       {
+        usleep(5000);
+
         int isPoke = getMsg();
 
         if (isPoke == 1)
@@ -339,6 +361,7 @@ void* extractor(void* userdata)
       }
     }
 
+    cJSON_AddItemToObject(root, "boxes", jBoxes);
     cJSON_AddItemToObject(root, "pokemon", jParty);
 
     char *rendered = cJSON_Print(root);

@@ -214,6 +214,26 @@ int main(void)
 
   for (int bi=0; bi<14; bi++)
   {
+    u8* boxName = pc->boxNames[bi];
+
+    u32 bn1 =
+        (boxName[0] << 24)
+      | (boxName[1] << 16)
+      | (boxName[2] << 8)
+      | (boxName[3]);
+
+    u32 bn2 =
+        (boxName[4] << 24)
+      | (boxName[5] << 16)
+      | (boxName[6] << 8)
+      | (boxName[7]);
+
+    sendU32(bn1);
+    waitForAck();
+
+    sendU32(bn2);
+    waitForAck();
+
     struct BoxPokemon* box = pc->boxes[bi];
 
     for (int si=0; si<30; si++)
