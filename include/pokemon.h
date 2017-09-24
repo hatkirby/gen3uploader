@@ -35,6 +35,13 @@ struct __attribute__((aligned(4))) PokemonIntermediate {
   // while not uniformly random (amongst Pokémon), is included as a sort of
   // "namespace", in that any Pokémon with matching PVs and IVs must also have
   // the same OT, thus preventing collaboratively finding PV and IV collisions.
+  // there is one deterministic way that two Pokémon can have the same hash:
+  // when a Nincada evolves into a Ninjask and a Shedinja is generated, the
+  // Shedinja is guaranteed to have the same IVs and personality value as the
+  // Ninjask. we circumvent this by also including a boolean in the hash which
+  // is set to true if the Pokémon is a Shedinja, and false otherwise. this
+  // differentiates a Shedinja from the Ninjask it came from, but also allows
+  // the Ninjask to be associated with the Nincada it used to be.
   u32 key[7];
 
   u32 experience;

@@ -12,6 +12,20 @@
 #include "dexorder.h"
 #include "sha2.h"
 
+// See pokemon.h for more information about this.
+struct HashDeterminer {
+  u32 otId;
+  u32 personality;
+  u32 hpIV:5;
+  u32 attackIV:5;
+  u32 defenseIV:5;
+  u32 speedIV:5;
+  u32 spAttackIV:5;
+  u32 spDefenseIV:5;
+  u32 isShedinja:1;
+  u32 zero:1;
+};
+
 u32 CalculateStat(
   u8 base,
   u32 iv,
@@ -50,13 +64,20 @@ void PokemonIntermediateInit(
   struct PokemonSubstruct2* sub2 = GetBoxPokemonSubstruct2(bpkm);
   struct PokemonSubstruct3* sub3 = GetBoxPokemonSubstruct3(bpkm);
 
-  u32 identifier[3];
-  identifier[0] = bpkm->otId;             // original trainer
-  identifier[1] = bpkm->personality;      // personality value
-  identifier[2] = ((const u32*)sub3)[1];  // IVs (plus two non-random bits)
+  struct HashDeterminer identifier;
+  identifier.otId = bpkm->otId;
+  identifier.personality = bpkm->personality;
+  identifier.hpIV = sub3->hpIV;
+  identifier.attackIV = sub3->attackIV;
+  identifier.defenseIV = sub3->defenseIV;
+  identifier.speedIV = sub3->speedIV;
+  identifier.spAttackIV = sub3->spAttackIV;
+  identifier.spDefenseIV = sub3->spDefenseIV;
+  identifier.isShedinja = (sub0->species == SHEDINJA_SPECIES_INDEX) ? 1 : 0;
+  identifier.zero = 0;
 
   sha224(
-    (const unsigned char*)identifier,
+    (const unsigned char*)&identifier,
     12,
     (unsigned char*)pki->key);
 
