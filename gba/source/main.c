@@ -179,20 +179,22 @@ int main(void)
 
   // Start sending over party pokémon.
   struct Pokemon* playerParty = 0;
+  u32 partyCount = 1;
   if (GAME_RS)
   {
     playerParty = gameData.SaveBlock1->rs.playerParty;
+    partyCount = gameData.SaveBlock1->rs.playerPartyCount;
   } else if (GAME_FRLG)
   {
     playerParty = gameData.SaveBlock1->frlg.playerParty;
+    partyCount = gameData.SaveBlock1->frlg.playerPartyCount;
   } else if (GAME_EM)
   {
     playerParty = gameData.SaveBlock1->e.playerParty;
+    partyCount = gameData.SaveBlock1->e.playerPartyCount;
   }
 
   waitForResponse();
-
-  u32 partyCount = 1;
 
   sendU32(partyCount);
   waitForAck();
