@@ -379,32 +379,32 @@ void* extractor(void* userdata)
       cJSON_AddNumberToObject(
         jPoke,
         "coolness",
-        __builtin_bswap32(pki->cool));
+        pki->cool);
 
       cJSON_AddNumberToObject(
         jPoke,
         "beauty",
-        __builtin_bswap32(pki->beauty));
+        pki->beauty);
 
       cJSON_AddNumberToObject(
         jPoke,
         "cuteness",
-        __builtin_bswap32(pki->cute));
+        pki->cute);
 
       cJSON_AddNumberToObject(
         jPoke,
         "smartness",
-        __builtin_bswap32(pki->smart));
+        pki->smart);
 
       cJSON_AddNumberToObject(
         jPoke,
         "toughness",
-        __builtin_bswap32(pki->tough));
+        pki->tough);
 
       cJSON_AddNumberToObject(
         jPoke,
         "sheen",
-        __builtin_bswap32(pki->sheen));
+        pki->sheen);
 
       cJSON_AddItemToObject(
         jPoke,
