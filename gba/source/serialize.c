@@ -135,10 +135,10 @@ void PokemonIntermediateInit(
   if (sub0->species == UNOWN_SPECIES_INDEX)
   {
     u8 unownDeterminer =
-        ((bpkm->personality & 0x07000000) >> 18)
-      | ((bpkm->personality & 0x00070000) >> 12)
-      | ((bpkm->personality & 0x00000700) >> 6)
-      |  (bpkm->personality & 0x00000007);
+        ((bpkm->personality & 0x03000000) >> 18)
+      | ((bpkm->personality & 0x00030000) >> 12)
+      | ((bpkm->personality & 0x00000300) >> 6)
+      |  (bpkm->personality & 0x00000003);
 
     pki->unownLetter = (unownDeterminer % 28);
   }

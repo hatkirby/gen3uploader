@@ -203,7 +203,7 @@ cJSON* pokemonToJson(const struct PokemonIntermediate* pki)
     pki->altAbility);
 
   // Handle Unown form.
-  if (pki->species == 201)
+  if (__builtin_bswap16(pki->species) == 201)
   {
     cJSON_AddNumberToObject(
       jPoke,
