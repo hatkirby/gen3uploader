@@ -28,4 +28,4 @@ From there, you should be able to run the `build.sh` script in the `gen3uploader
 Have a GC Controller in Port 1 and a GBA with Gen3 game in Port 2. Run the Wii program, and follow the instructions. The connection is not very stable, and it can take several tries for the program to run successfully.
 
 # Acknowledgements
-Thanks to FIX94 for your multiboot game dumper, which the multiboot code is loosely based on (differences in crypto & protocol...). Thanks to Wack0 for reverse-engineering the gen 3 "different" multiboot protocol.
+Thanks to FIX94 for your [multiboot game dumper](https://github.com/FIX94/gba-link-cable-dumper), which the multiboot code is loosely based on (differences in crypto & protocol). Thanks to Wack0 for [reverse-engineering the gen 3 "different" multiboot protocol](https://github.com/Wack0/gba-gen3multiboot).
