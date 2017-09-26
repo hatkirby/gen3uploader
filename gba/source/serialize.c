@@ -10,21 +10,7 @@
 #include "basestats.h"
 #include "exptables.h"
 #include "dexorder.h"
-#include "sha2.h"
-
-// See pokemon.h for more information about this.
-struct HashDeterminer {
-  u32 otId;
-  u32 personality;
-  u32 hpIV:5;
-  u32 attackIV:5;
-  u32 defenseIV:5;
-  u32 speedIV:5;
-  u32 spAttackIV:5;
-  u32 spDefenseIV:5;
-  u32 isShedinja:1;
-  u32 zero:1;
-};
+#include "blake2.h"
 
 u32 CalculateStat(
   u8 base,
@@ -64,22 +50,25 @@ void PokemonIntermediateInit(
   struct PokemonSubstruct2* sub2 = GetBoxPokemonSubstruct2(bpkm);
   struct PokemonSubstruct3* sub3 = GetBoxPokemonSubstruct3(bpkm);
 
-  struct HashDeterminer identifier;
-  identifier.otId = bpkm->otId;
-  identifier.personality = bpkm->personality;
-  identifier.hpIV = sub3->hpIV;
-  identifier.attackIV = sub3->attackIV;
-  identifier.defenseIV = sub3->defenseIV;
-  identifier.speedIV = sub3->speedIV;
-  identifier.spAttackIV = sub3->spAttackIV;
-  identifier.spDefenseIV = sub3->spDefenseIV;
-  identifier.isShedinja = (sub0->species == SHEDINJA_SPECIES_INDEX) ? 1 : 0;
-  identifier.zero = 0;
+  u8 identifier[16];
+  identifier[0] =  bpkm->otId               & 0x000000FF;
+  identifier[1] = (bpkm->otId >> 8)         & 0x000000FF;
+  identifier[2] = (bpkm->otId >> 16)        & 0x000000FF;
+  identifier[3] = (bpkm->otId >> 24)        & 0x000000FF;
+  identifier[4] =  bpkm->personality        & 0x000000FF;
+  identifier[5] = (bpkm->personality >> 8)  & 0x000000FF;
+  identifier[6] = (bpkm->personality >> 16) & 0x000000FF;
+  identifier[7] = (bpkm->personality >> 24) & 0x000000FF;
+  identifier[8] = sub3->hpIV;
+  identifier[9] = sub3->attackIV;
+  identifier[10] = sub3->defenseIV;
+  identifier[11] = sub3->speedIV;
+  identifier[12] = sub3->spAttackIV;
+  identifier[13] = sub3->spDefenseIV;
+  identifier[14] = (sub0->species == SHEDINJA_SPECIES_INDEX) ? 1 : 0;
+  identifier[15] = 0;
 
-  sha224(
-    (const unsigned char*)&identifier,
-    12,
-    (unsigned char*)pki->key);
+  blake2s((u8*)pki->key, 28, identifier, 16, 0, 0);
 
   const struct SmallBaseStats* baseStats = BaseStatsForSpecies(sub0->species);
 

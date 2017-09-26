@@ -296,7 +296,7 @@ void* extractor(void* userdata)
 
     for (u32 i = 0; i < partyCount; i++)
     {
-      usleep(5000);
+      usleep(6000);
 
       u32 rawdata[sizeof(struct PokemonIntermediate) / 4];
       getMsgArr(rawdata, sizeof(struct PokemonIntermediate) / 4);
@@ -336,13 +336,13 @@ void* extractor(void* userdata)
 
       for (int j=0; j<30; j++)
       {
-        usleep(5000);
+        usleep(6000);
 
         int isPoke = getMsg();
 
         if (isPoke == 1)
         {
-          usleep(5000);
+          usleep(6000);
 
           u32 rawdata[sizeof(struct PokemonIntermediate) / 4];
           getMsgArr(rawdata, sizeof(struct PokemonIntermediate) / 4);
