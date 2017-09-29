@@ -101,6 +101,26 @@ void PokemonIntermediateInit(
   pki->language = bpkm->language & 7;
   pki->orre = (sub3->metGame == 15);
 
+  pki->coolRibbons = sub3->coolRibbon;
+  pki->beautyRibbons = sub3->beautyRibbon;
+  pki->cuteRibbons = sub3->cuteRibbon;
+  pki->smartRibbons = sub3->smartRibbon;
+  pki->toughRibbons = sub3->toughRibbon;
+
+  pki->miscRibbons =
+      (CHAMPION_RIBBON * sub3->championRibbon)
+    | (WINNING_RIBBON * sub3->winningRibbon)
+    | (VICTORY_RIBBON * sub3->victoryRibbon)
+    | (ARTIST_RIBBON * sub3->artistRibbon)
+    | (EFFORT_RIBBON * sub3->effortRibbon)
+    | (MARINE_RIBBON * sub3->marineRibbon)
+    | (LAND_RIBBON * sub3->landRibbon)
+    | (SKY_RIBBON * sub3->skyRibbon)
+    | (COUNTRY_RIBBON * sub3->countryRibbon)
+    | (NATIONAL_RIBBON * sub3->nationalRibbon)
+    | (EARTH_RIBBON * sub3->earthRibbon)
+    | (WORLD_RIBBON * sub3->worldRibbon);
+
   // Derive nature from the personality value.
   pki->nature = (bpkm->personality % 25);
 

@@ -211,5 +211,72 @@ cJSON* pokemonToJson(const struct PokemonIntermediate* pki)
       pki->unownLetter);
   }
 
+  cJSON_AddNumberToObject(jPoke, "coolRibbons", pki->coolRibbons);
+  cJSON_AddNumberToObject(jPoke, "beautyRibbons", pki->beautyRibbons);
+  cJSON_AddNumberToObject(jPoke, "cuteRibbons", pki->cuteRibbons);
+  cJSON_AddNumberToObject(jPoke, "smartRibbons", pki->smartRibbons);
+  cJSON_AddNumberToObject(jPoke, "toughRibbons", pki->toughRibbons);
+
+  u16 miscRibbons = __builtin_bswap16(pki->miscRibbons);
+  if (miscRibbons & CHAMPION_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "championRibbon", true);
+  }
+
+  if (miscRibbons & WINNING_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "winningRibbon", true);
+  }
+
+  if (miscRibbons & VICTORY_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "victoryRibbon", true);
+  }
+
+  if (miscRibbons & ARTIST_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "artistRibbon", true);
+  }
+
+  if (miscRibbons & EFFORT_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "effortRibbon", true);
+  }
+
+  if (miscRibbons & MARINE_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "marineRibbon", true);
+  }
+
+  if (miscRibbons & LAND_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "landRibbon", true);
+  }
+
+  if (miscRibbons & SKY_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "skyRibbon", true);
+  }
+
+  if (miscRibbons & COUNTRY_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "countryRibbon", true);
+  }
+
+  if (miscRibbons & NATIONAL_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "nationalRibbon", true);
+  }
+
+  if (miscRibbons & EARTH_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "earthRibbon", true);
+  }
+
+  if (miscRibbons & WORLD_RIBBON)
+  {
+    cJSON_AddBoolToObject(jPoke, "worldRibbon", true);
+  }
+
   return jPoke;
 }

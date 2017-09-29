@@ -20,6 +20,19 @@ enum PokemonLanguage {
   Spanish = 7
 };
 
+#define CHAMPION_RIBBON (1 << 0)
+#define WINNING_RIBBON  (1 << 1)
+#define VICTORY_RIBBON  (1 << 2)
+#define ARTIST_RIBBON   (1 << 3)
+#define EFFORT_RIBBON   (1 << 4)
+#define MARINE_RIBBON   (1 << 5)
+#define LAND_RIBBON     (1 << 6)
+#define SKY_RIBBON      (1 << 7)
+#define COUNTRY_RIBBON  (1 << 8)
+#define NATIONAL_RIBBON (1 << 9)
+#define EARTH_RIBBON    (1 << 10)
+#define WORLD_RIBBON    (1 << 11)
+
 struct __attribute__((aligned(4))) PokemonIntermediate {
   // a hash that can be used to identify the Pokémon. because the games do not
   // naturally generate unique identifiers for Pokémon, this hash is generated
@@ -59,7 +72,13 @@ struct __attribute__((aligned(4))) PokemonIntermediate {
   u16 heldItem;
   u16 moves[4];
   u16 otId; // only the lower 2 bytes, because the upper 2 are secret
+  u16 miscRibbons;
 
+  u8 coolRibbons;
+  u8 beautyRibbons;
+  u8 cuteRibbons;
+  u8 smartRibbons;
+  u8 toughRibbons;
   u8 ppBonuses;
   u8 otGender;
   u8 metLevel;

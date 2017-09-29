@@ -342,13 +342,13 @@ struct PokemonSubstruct3
  /* 0x0A */ u32 victoryRibbon:1;
  /* 0x0A */ u32 artistRibbon:1;
  /* 0x0A */ u32 effortRibbon:1;
- /* 0x0A */ u32 giftRibbon1:1;
- /* 0x0A */ u32 giftRibbon2:1;
- /* 0x0A */ u32 giftRibbon3:1;
- /* 0x0A */ u32 giftRibbon4:1;
- /* 0x0B */ u32 giftRibbon5:1;
- /* 0x0B */ u32 giftRibbon6:1;
- /* 0x0B */ u32 giftRibbon7:1;
+ /* 0x0A */ u32 marineRibbon:1;
+ /* 0x0A */ u32 landRibbon:1;
+ /* 0x0A */ u32 skyRibbon:1;
+ /* 0x0A */ u32 countryRibbon:1;
+ /* 0x0B */ u32 nationalRibbon:1;
+ /* 0x0B */ u32 earthRibbon:1;
+ /* 0x0B */ u32 worldRibbon:1;
  /* 0x0B */ u32 fatefulEncounter:5; // unused in Ruby/Sapphire, but the high bit must be set for Mew/Deoxys to obey in FR/LG/Emerald
 };
 
