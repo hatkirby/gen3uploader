@@ -125,10 +125,13 @@ cJSON* pokemonToJson(const struct PokemonIntermediate* pki)
     "experience",
     __builtin_bswap32(pki->experience));
 
-  cJSON_AddNumberToObject(
-    jPoke,
-    "heldItem",
-    __builtin_bswap16(pki->heldItem));
+  if (pki->heldItem)
+  {
+    cJSON_AddNumberToObject(
+      jPoke,
+      "heldItem",
+      __builtin_bswap16(pki->heldItem));
+  }
 
   cJSON* jMoves = cJSON_CreateArray();
 
