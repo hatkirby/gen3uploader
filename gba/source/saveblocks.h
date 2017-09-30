@@ -82,9 +82,9 @@ typedef struct
     /*0x303C*/ u8 filler_303C[0x38];
     /*0x3074*/ u8 filler_3074[0x42];
     /*0x30B6*/ u8 filler_30B6;
-    /*0x30B7*/ u8 filler_30B7[0x59];
-    /*0x3110*/ u8 giftRibbons[7];
-    /*0x3117*/ u8 filler_311B[0x2D];
+    /*0x30B7*/ u8 filler_30B7[0x5B];
+    /*0x3112*/ u8 giftRibbons[7];
+    /*0x3119*/ u8 filler_311B[0x2B];
     /*0x3144*/ struct Roamer roamer;
     /*0x3158*/ u8 filler_3158[0x8];
     /*0x3160*/ struct EnigmaBerry enigmaBerry; // this is actually offset by 0x98 ...
@@ -103,24 +103,23 @@ typedef struct // Don't rely on the commented offsets, they'll be wrong due to e
     /*0x2F*/ u8 filler_2F;
     /*0x30*/ u8 flashUsed;
     /*0x32*/ u16 mapDataId;
-//    /*0x34*/ u16 mapView[0x100]; // Not in fr/lg
-    /*0x234*/ u8 playerPartyCount;
-    /*0x238*/ struct Pokemon playerParty[6];
-    /*0x490*/ u32 money;
-    /*0x494*/ u16 coins;
-    /*0x496*/ u16 registeredItem; // registered for use with SELECT button
-    /*0x498*/ struct ItemSlot pcItems[30];
-    /*0x560*/ struct ItemSlot bagPocket_Items[42];
-    /*0x5B0*/ struct ItemSlot bagPocket_KeyItems[30];
-    /*0x600*/ struct ItemSlot bagPocket_PokeBalls[13];
-    /*0x640*/ struct ItemSlot bagPocket_TMHM[58];
-    /*0x740*/ struct ItemSlot bagPocket_Berries[43];
-//    /*0x7F8*/ struct Pokeblock pokeblocks[40]; // Not in fr/lg
-    /*0x938*/ u8 unk938[52];  // pokedex related
-    /*0x96C*/ u8 unk_62C[12];
-    /*0x972*/ u8 filler_972[0x6];
-    /*0x97A*/ u8 unk_63E[98];
-    /*0x9E0*/ struct MapObject mapObjects[16];
+    /*0x34*/ u8 playerPartyCount;
+    /*0x38*/ struct Pokemon playerParty[6];
+    /*0x290*/ u32 money;
+    /*0x294*/ u16 coins;
+    /*0x296*/ u16 registeredItem; // registered for use with SELECT button
+    /*0x298*/ struct ItemSlot pcItems[30];
+    /*0x360*/ struct ItemSlot bagPocket_Items[42];
+    /*0x3B0*/ struct ItemSlot bagPocket_KeyItems[30];
+    /*0x400*/ struct ItemSlot bagPocket_PokeBalls[13];
+    /*0x440*/ struct ItemSlot bagPocket_TMHM[58];
+    /*0x540*/ struct ItemSlot bagPocket_Berries[43];
+    /*0x5EA*/ u8 unk938[52];  // pokedex related
+    /*0x61E*/ u8 unk_62C[12];
+    /*0x62A*/ u8 filler_972[0x6];
+    /*0x630*/ u8 unk_63E[98];
+    /*0x692*/ struct MapObject mapObjects[16];
+  // offsets are mostly wrong below here
     /*0xC20*/ struct MapObjectTemplate mapObjectTemplates[64];
     /*0x1220*/ u8 flags[0x120];
     /*0x1340*/ u16 vars[0x100];
@@ -130,11 +129,13 @@ typedef struct // Don't rely on the commented offsets, they'll be wrong due to e
 	struct NPCState npc_states[0x10];
 	u8 unk_2f10[112];
 	struct DaycarePokemon daycare[2];
-	u8 unk_3098[56];
+  u8 unk_3098[4];
+  u8 giftRibbons[7];
+	u8 unk_30A3[45];
 	struct Roamer roamer;
 	u8 unk_30e4[8];
 	/*0x3160*/ struct EnigmaBerryFRLGE enigmaBerry;
-	u8 unk_3120[0x1C0]; // 4 bytes of CRC16, then 444 bytes of unknown. Mystery Gift related.
+  u8 unk_3120[0x1C0]; // 4 bytes of CRC16, then 444 bytes of unknown. Mystery Gift related.
 	u8 unk_32E0[0x150]; // 4 bytes of CRC16, then 332 bytes of unknown. Mystery Gift related. "mevent_buffer_1"
 	u8 unk_3430[0x150]; // 4 bytes of CRC16, then 332 bytes of unknown. Mystery Gift related. "mevent_buffer_2"
 	u8 unk_368C[0x9C]; // padding? doesn't seem to be actually used
@@ -215,9 +216,9 @@ typedef struct // Don't rely on the commented offsets, they'll be wrong due to e
     /*0x2DD4*/ struct EasyChatPair easyChatPairs[5]; //Dewford trend [0] and some other stuff
     // /*0x2DFC*/ u8 filler_2DFC[0x100];
     /*0x2EFC*/ struct SB1_2EFC_Struct sb1_2EFC_struct[12];
-	u8 unk_3010[0x198]; // no idea if any of this is actually used.
-    /*0x3110*/ u8 giftRibbons[7];
-    /*0x3117*/ u8 filler_311B[0x2D];
+	u8 unk_3010[0x19A]; // no idea if any of this is actually used.
+    /*0x310E*/ u8 giftRibbons[7];
+    /*0x3115*/ u8 filler_311B[0x2B];
     /*0x3144*/ struct Roamer roamer;
     /*0x3158*/ u8 filler_3158[0x8];
     /*0x3160*/ struct EnigmaBerryFRLGE enigmaBerry;

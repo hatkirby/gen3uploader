@@ -130,6 +130,36 @@ int main(void)
     return 0;
   }
 
+  // Send gift ribbon descriptions
+  u8* giftRibbons = 0;
+  if (GAME_RS)
+  {
+    giftRibbons = gameData.SaveBlock1->rs.giftRibbons;
+  } else if (GAME_FRLG)
+  {
+    giftRibbons = gameData.SaveBlock1->frlg.giftRibbons;
+  } else if (GAME_EM)
+  {
+    giftRibbons = gameData.SaveBlock1->e.giftRibbons;
+  }
+
+  u32 gn1 =
+      (giftRibbons[0] << 24)
+    | (giftRibbons[1] << 16)
+    | (giftRibbons[2] << 8)
+    | (giftRibbons[3]);
+
+  u32 gn2 =
+      (giftRibbons[4] << 24)
+    | (giftRibbons[5] << 16)
+    | (giftRibbons[6] << 8);
+
+  sendU32(gn1);
+  waitForAck();
+
+  sendU32(gn2);
+  waitForAck();
+
   // Send Pokédex data
   u8* pokedexSeen = 0;
   if (GAME_RS)

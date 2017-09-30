@@ -257,6 +257,55 @@ void* extractor(void* userdata)
     cJSON_AddNumberToObject(root, "gameId", gameId);
     cJSON_AddNumberToObject(root, "language", gameLanguage);
 
+    // Get gift ribbon descriptions.
+    u8 giftRibbons[7];
+
+    tnd = getMsg();
+    giftRibbons[0] = (tnd & 0xFF000000) >> 24;
+    giftRibbons[1] = (tnd & 0x00FF0000) >> 16;
+    giftRibbons[2] = (tnd & 0x0000FF00) >> 8;
+    giftRibbons[3] = (tnd & 0x000000FF);
+
+    tnd = getMsg();
+    giftRibbons[4] = (tnd & 0xFF000000) >> 24;
+    giftRibbons[5] = (tnd & 0x00FF0000) >> 16;
+    giftRibbons[6] = (tnd & 0x0000FF00) >> 8;
+
+    if (giftRibbons[0])
+    {
+      cJSON_AddNumberToObject(root, "marineRibbon", giftRibbons[0]);
+    }
+
+    if (giftRibbons[1])
+    {
+      cJSON_AddNumberToObject(root, "landRibbon", giftRibbons[1]);
+    }
+
+    if (giftRibbons[2])
+    {
+      cJSON_AddNumberToObject(root, "skyRibbon", giftRibbons[2]);
+    }
+
+    if (giftRibbons[3])
+    {
+      cJSON_AddNumberToObject(root, "countryRibbon", giftRibbons[3]);
+    }
+
+    if (giftRibbons[4])
+    {
+      cJSON_AddNumberToObject(root, "nationalRibbon", giftRibbons[4]);
+    }
+
+    if (giftRibbons[5])
+    {
+      cJSON_AddNumberToObject(root, "earthRibbon", giftRibbons[5]);
+    }
+
+    if (giftRibbons[6])
+    {
+      cJSON_AddNumberToObject(root, "worldRibbon", giftRibbons[6]);
+    }
+
     // Get Pokédex data
     u32 pokedexSeen[13];
     u32 pokedexCaught[13];
