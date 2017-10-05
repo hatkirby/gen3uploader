@@ -169,15 +169,20 @@ cJSON* pokemonToJson(const struct PokemonIntermediate* pki)
     cJSON_AddStringToObject(jPoke, "otGender", "male");
   }
 
-  cJSON_AddNumberToObject(
-    jPoke,
-    "metLevel",
-    pki->metLevel);
+  if (pki->orre)
+  {
+    cJSON_AddBoolToObject(jPoke, "orre", true);
+  } else {
+    cJSON_AddNumberToObject(
+      jPoke,
+      "metLevel",
+      pki->metLevel);
 
-  cJSON_AddNumberToObject(
-    jPoke,
-    "metLocation",
-    pki->metLocation);
+    cJSON_AddNumberToObject(
+      jPoke,
+      "metLocation",
+      pki->metLocation);
+  }
 
   cJSON_AddBoolToObject(
     jPoke,
@@ -204,6 +209,11 @@ cJSON* pokemonToJson(const struct PokemonIntermediate* pki)
     jPoke,
     "secondAbility",
     pki->altAbility);
+
+  cJSON_AddNumberToObject(
+    jPoke,
+    "pokeball",
+    pki->pokeball);
 
   // Handle Unown form.
   if (__builtin_bswap16(pki->species) == 201)
