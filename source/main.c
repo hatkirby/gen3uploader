@@ -425,7 +425,7 @@ void* extractor(void* userdata)
       sslContext,
       root,
       cJSON_GetObjectItem(config, "username")->valuestring,
-      cJSON_GetObjectItem(config, "password")->valuestring);
+      cJSON_GetObjectItem(config, "token")->valuestring);
 
     printf("Result: %d\n", result);
 

@@ -146,22 +146,12 @@ int submitToApi(
   WOLFSSL_CTX* sslContext,
   cJSON* data,
   const char* username,
-  const char* password)
+  const char* token)
 {
   // Form request body.
   cJSON* jRequestBody = cJSON_CreateObject();
 
   cJSON_AddItemToObject(jRequestBody, "game", data);
-
-  cJSON_AddItemToObject(
-    jRequestBody,
-    "username",
-    cJSON_CreateString(username));
-
-  cJSON_AddItemToObject(
-    jRequestBody,
-    "password",
-    cJSON_CreateString(password));
 
   const char* requestBody = cJSON_PrintUnformatted(jRequestBody);
 
@@ -304,7 +294,10 @@ int submitToApi(
   r += sprintf(r, "POST %s HTTP/1.1\r\n", httpPath);
   r += sprintf(r, "Host: %s\r\n", httpHost);
   r += sprintf(r, "Content-Type: application/json\r\n");
-  r += sprintf(r, "Content-Length: %d\r\n\r\n", strlen(requestBody));
+  r += sprintf(r, "Content-Length: %d\r\n", strlen(requestBody));
+  r += sprintf(r, "X-User-Login: %s\r\n", username);
+  r += sprintf(r, "X-User-Token: %s\r\n", token);
+  r += sprintf(r, "\r\n");
 
   int result = tcpWrite(
     secure,

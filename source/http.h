@@ -24,14 +24,13 @@ typedef enum {
 } http_res;
 
 /**
- * Submits a JSON request to a web service. Takes ownership of the cJSON object,
- * because it needs to embed authentication data in it.
+ * Submits a JSON request to a web service. Takes ownership of the cJSON object.
  */
 int submitToApi(
   const char* endpoint,
   WOLFSSL_CTX* sslContext,
   cJSON* data,
   const char* username,
-  const char* password);
+  const char* token);
 
 #endif /* end of include guard: HTTP_H_A46C206E */
