@@ -113,7 +113,7 @@ void* extractor(void* userdata)
   {
     wolfSSL_Init();
 
-    sslContext = wolfSSL_CTX_new(wolfTLSv1_client_method());
+    sslContext = wolfSSL_CTX_new(wolfSSLv23_client_method());
     if (sslContext == NULL)
     {
       fatalError("wolfSSL_CTX_new error.\n");
