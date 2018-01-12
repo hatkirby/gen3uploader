@@ -16,7 +16,7 @@ In order to compile wolfSSL, first ensure your $DEVKITPPC environment variable i
 
 ```bash
 ./autogen.sh
-./configure --disable-shared CC=$DEVKITPPC/bin/powerpc-eabi-gcc --host=ppc --enable-singlethreaded RANLIB=$DEVKITPPC/bin/powerpc-eabi-gcc-ranlib CFLAGS="-DDEVKITPRO -DNO_WRITEV" --disable-examples --disable-crypttests
+./configure --disable-shared CC=$DEVKITPPC/bin/powerpc-eabi-gcc --host=ppc --enable-singlethreaded RANLIB=$DEVKITPPC/bin/powerpc-eabi-gcc-ranlib CFLAGS="-DDEVKITPRO -DNO_WRITEV" --disable-examples --disable-crypttests --enable-ecc
 make
 cp src/.libs/libwolfssl.a $GEN3UPLOADER/vendor/lib/
 cp -r wolfssl $GEN3UPLOADER/vendor/include/
