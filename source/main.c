@@ -70,6 +70,11 @@ void fatalError(char *msg)
   exit(0);
 }
 
+inline u32 getPokedexFlag(const u32* data, int i)
+{
+  return (data[i >> 5] >> (i & 31) & 1);
+}
+
 cJSON* getConfig()
 {
   FILE* fp = fopen("/gen3uploader.cfg", "r");
@@ -314,22 +319,37 @@ void* extractor(void* userdata)
     getMsgArr(pokedexCaught, 13);
 
     printf("Saw: ");
+
+    cJSON* jSeen = cJSON_CreateArray();
     for (int i=0; i<(13*32); i++)
     {
-      if (pokedexSeen[i >> 5] >> (i & 31) & 1)
+      if (getPokedexFlag(pokedexSeen, i))
       {
         printf("#%d, ", i+1);
+
+        if (!getPokedexFlag(pokedexCaught, i))
+        {
+          cJSON_AddItemToArray(jSeen, cJSON_CreateNumber(i + 1));
+        }
       }
     }
 
+    cJSON_AddItemToObject(root, "seen", jSeen);
+
     printf("\nCaught: ");
+
+    cJSON* jCaught = cJSON_CreateArray();
     for (int i=0; i<(13*32); i++)
     {
-      if (pokedexCaught[i >> 5] >> (i & 31) & 1)
+      if (getPokedexFlag(pokedexCaught, i))
       {
         printf("#%d, ", i+1);
+
+        cJSON_AddItemToArray(jCaught, cJSON_CreateNumber(i + 1));
       }
     }
+
+    cJSON_AddItemToObject(root, "caught", jCaught);
 
     printf("\n");
 
